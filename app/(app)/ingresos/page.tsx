@@ -48,13 +48,13 @@ export default async function IngresosPage({
           description: item.description,
           dayOfMonth: item.dayOfMonth,
           active: item.active,
-          category: { name: item.category.name, icon: item.category.icon },
+          category: { id: item.category.id, name: item.category.name, icon: item.category.icon },
         }))}
       />
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">Ingresos de {monthLabel(month, year).toLowerCase()}</h2>
-        <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100">
+        <div className="card-surface divide-y divide-gray-100">
           {incomes.map((income) => (
             <IncomeRow
               key={income.id}

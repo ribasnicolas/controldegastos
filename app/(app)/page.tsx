@@ -10,27 +10,31 @@ export default async function DashboardPage() {
   const data = await getDashboardData(user.id, user.householdId);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <p className="text-sm text-gray-500">{monthLabel(data.month, data.year)}</p>
         <div
-          className={`mt-2 rounded-2xl p-5 ${
+          className={`mt-2 rounded-3xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] ${
             data.available >= 0 ? "bg-brand-primary/10" : "bg-brand-danger/10"
           }`}
         >
           <p className="text-sm text-gray-600">Disponible</p>
-          <p className={`text-3xl font-bold ${data.available >= 0 ? "text-brand-primary-dark" : "text-brand-danger"}`}>
+          <p
+            className={`text-4xl font-bold tracking-tight ${
+              data.available >= 0 ? "text-brand-primary-dark" : "text-brand-danger"
+            }`}
+          >
             {formatCurrency(data.available)}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-white border border-gray-200 p-4">
+        <div className="card-surface p-4">
           <p className="text-xs text-gray-500">Ingresos del mes</p>
           <p className="text-lg font-semibold text-gray-900">{formatCurrency(data.totalIncome)}</p>
         </div>
-        <div className="rounded-2xl bg-white border border-gray-200 p-4">
+        <div className="card-surface p-4">
           <p className="text-xs text-gray-500">Gastos del mes</p>
           <p className="text-lg font-semibold text-gray-900">{formatCurrency(data.totalExpense)}</p>
         </div>
@@ -39,7 +43,7 @@ export default async function DashboardPage() {
       {data.household && (
         <Link
           href="/hogar"
-          className="block rounded-2xl bg-brand-secondary/10 border border-brand-secondary/30 p-4"
+          className="block rounded-2xl bg-brand-secondary/10 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] tap"
         >
           <p className="text-xs text-gray-600">Hogar · {data.household.name}</p>
           <p className="text-lg font-semibold text-gray-900">
@@ -50,7 +54,7 @@ export default async function DashboardPage() {
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">Gastos por categoría</h2>
-        <div className="rounded-2xl bg-white border border-gray-200 p-4">
+        <div className="card-surface p-4">
           <ExpensePieChart data={data.expensesBreakdown} />
           <ul className="mt-2 space-y-2">
             {data.expensesBreakdown.map((row) => (
@@ -67,7 +71,7 @@ export default async function DashboardPage() {
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">Estampados</h2>
-        <div className="rounded-2xl bg-white border border-gray-200 p-4 grid grid-cols-2 gap-4">
+        <div className="card-surface p-4 grid grid-cols-2 gap-4">
           {(
             [
               { label: "Este mes", data: data.estampados.month },
@@ -95,7 +99,7 @@ export default async function DashboardPage() {
               Editar
             </Link>
           </div>
-          <div className="rounded-2xl bg-white border border-gray-200 p-4 space-y-4">
+          <div className="card-surface p-4 space-y-4">
             {data.budgetsBreakdown.map((row) => {
               const pct = row.budgeted > 0 ? Math.min(100, (row.spent / row.budgeted) * 100) : 0;
               const overBudget = row.spent > row.budgeted;
@@ -111,7 +115,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${overBudget ? "bg-brand-danger" : "bg-brand-primary"}`}
+                      className={`h-full rounded-full transition-all duration-300 ${overBudget ? "bg-brand-danger" : "bg-brand-primary"}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -124,7 +128,7 @@ export default async function DashboardPage() {
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">Últimos movimientos</h2>
-        <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100">
+        <div className="card-surface divide-y divide-gray-100">
           {[
             ...data.recentExpenses.map((e) => ({
               id: e.id,

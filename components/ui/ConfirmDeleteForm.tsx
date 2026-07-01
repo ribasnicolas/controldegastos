@@ -4,7 +4,7 @@ export function ConfirmDeleteForm({
   action,
   confirmMessage,
   children,
-  className = "h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100",
+  className = "tap h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100",
 }: {
   action: (formData: FormData) => void | Promise<void>;
   confirmMessage: string;

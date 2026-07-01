@@ -22,11 +22,11 @@ export function IncomeForm({ categories }: { categories: Category[] }) {
   }, [state]);
 
   return (
-    <section className="rounded-2xl bg-white border border-gray-200">
+    <section className="card-surface">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left"
+        className="w-full flex items-center justify-between px-4 py-3 text-left tap"
       >
         <span className="text-sm font-semibold text-gray-700">Cargar ingreso</span>
         <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "+ Cargar ingreso"}</span>

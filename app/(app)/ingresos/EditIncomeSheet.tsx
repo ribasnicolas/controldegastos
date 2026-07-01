@@ -37,7 +37,7 @@ export function EditIncomeSheet({
   return (
     <div className="fixed inset-0 z-30 flex items-end bg-black/40" onClick={onClose}>
       <div
-        className="w-full max-w-lg mx-auto bg-white rounded-t-2xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 max-h-[85vh] overflow-y-auto"
+        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -45,7 +45,7 @@ export function EditIncomeSheet({
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100"
+            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap"
           >
             ✕
           </button>

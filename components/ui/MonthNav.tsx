@@ -19,7 +19,7 @@ export function MonthNav({
     <div className="flex items-center justify-between">
       <Link
         href={`${basePath}?y=${prev.year}&m=${prev.month}`}
-        className="h-9 w-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
+        className="tap h-9 w-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
         aria-label="Mes anterior"
       >
         ‹
@@ -37,7 +37,7 @@ export function MonthNav({
       ) : (
         <Link
           href={`${basePath}?y=${next.year}&m=${next.month}`}
-          className="h-9 w-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
+          className="tap h-9 w-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
           aria-label="Mes siguiente"
         >
           ›

@@ -48,13 +48,15 @@ export default async function GastosPage({
           description: item.description,
           dayOfMonth: item.dayOfMonth,
           active: item.active,
-          category: { name: item.category.name, icon: item.category.icon },
+          lastGeneratedMonth: item.lastGeneratedMonth,
+          lastGeneratedYear: item.lastGeneratedYear,
+          category: { id: item.category.id, name: item.category.name, icon: item.category.icon },
         }))}
       />
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">Gastos de {monthLabel(month, year).toLowerCase()}</h2>
-        <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100">
+        <div className="card-surface divide-y divide-gray-100">
           {expenses.map((expense) => (
             <ExpenseRow
               key={expense.id}

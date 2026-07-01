@@ -20,6 +20,14 @@ const recurringIncomeSchema = z.object({
   dayOfMonth: z.coerce.number().int().min(1).max(28),
 });
 
+const updateRecurringExpenseSchema = recurringExpenseSchema.extend({
+  id: z.string().min(1),
+});
+
+const updateRecurringIncomeSchema = recurringIncomeSchema.extend({
+  id: z.string().min(1),
+});
+
 export async function createRecurringExpense(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
   const parsed = recurringExpenseSchema.safeParse({
@@ -54,6 +62,58 @@ export async function createRecurringIncome(_prev: ActionState, formData: FormDa
   return { success: true };
 }
 
+export async function updateRecurringExpense(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = updateRecurringExpenseSchema.safeParse({
+    id: formData.get("id"),
+    categoryId: formData.get("categoryId"),
+    amount: formData.get("amount"),
+    description: formData.get("description") || undefined,
+    dayOfMonth: formData.get("dayOfMonth"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const { id, ...data } = parsed.data;
+  const result = await prisma.recurringExpense.updateMany({
+    where: { id, userId: user.id },
+    data,
+  });
+  if (result.count === 0) {
+    return { error: "No se pudo actualizar el gasto fijo" };
+  }
+
+  revalidatePath("/gastos");
+  return { success: true };
+}
+
+export async function updateRecurringIncome(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = updateRecurringIncomeSchema.safeParse({
+    id: formData.get("id"),
+    categoryId: formData.get("categoryId"),
+    amount: formData.get("amount"),
+    description: formData.get("description") || undefined,
+    dayOfMonth: formData.get("dayOfMonth"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const { id, ...data } = parsed.data;
+  const result = await prisma.recurringIncome.updateMany({
+    where: { id, userId: user.id },
+    data,
+  });
+  if (result.count === 0) {
+    return { error: "No se pudo actualizar el ingreso fijo" };
+  }
+
+  revalidatePath("/ingresos");
+  return { success: true };
+}
+
 export async function toggleRecurringExpense(id: string) {
   const user = await requireUser();
   const item = await prisma.recurringExpense.findFirstOrThrow({ where: { id, userId: user.id } });
@@ -81,46 +141,56 @@ export async function deleteRecurringIncome(id: string) {
 }
 
 /**
- * Materializa en Expense/Income los recurrentes cuyo dayOfMonth ya pasó
- * este mes y todavía no fueron generados. Pensado para llamarse desde
- * un cron diario (ver app/api/cron/recurring/route.ts).
+ * El usuario confirma que un gasto fijo ya vencido este mes fue pagado:
+ * recién en este momento se crea el Expense real y se descuenta del total.
+ */
+export async function confirmRecurringExpensePayment(id: string) {
+  const user = await requireUser();
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+
+  const item = await prisma.recurringExpense.findFirstOrThrow({ where: { id, userId: user.id } });
+
+  const alreadyConfirmed = item.lastGeneratedMonth === month && item.lastGeneratedYear === year;
+  if (!item.active || item.dayOfMonth > day || alreadyConfirmed) {
+    return;
+  }
+
+  await prisma.$transaction([
+    prisma.expense.create({
+      data: {
+        userId: item.userId,
+        categoryId: item.categoryId,
+        amount: item.amount,
+        description: item.description ?? undefined,
+        date: new Date(year, month - 1, item.dayOfMonth),
+        sourceRecurringId: item.id,
+      },
+    }),
+    prisma.recurringExpense.update({
+      where: { id: item.id },
+      data: { lastGeneratedMonth: month, lastGeneratedYear: year },
+    }),
+  ]);
+
+  revalidatePath("/gastos");
+  revalidatePath("/");
+}
+
+/**
+ * Materializa en Income los ingresos fijos cuyo dayOfMonth ya pasó este
+ * mes y todavía no fueron generados. Pensado para llamarse desde un cron
+ * diario (ver app/api/cron/recurring/route.ts). Los gastos fijos ya no se
+ * generan automáticamente: requieren confirmación manual del usuario
+ * (ver confirmRecurringExpensePayment).
  */
 export async function generateDueRecurring() {
   const now = new Date();
   const day = now.getDate();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
-
-  const dueExpenses = await prisma.recurringExpense.findMany({
-    where: {
-      active: true,
-      dayOfMonth: { lte: day },
-      OR: [
-        { lastGeneratedMonth: null },
-        { lastGeneratedYear: { not: year } },
-        { AND: [{ lastGeneratedYear: year }, { lastGeneratedMonth: { not: month } }] },
-      ],
-    },
-  });
-
-  for (const item of dueExpenses) {
-    await prisma.$transaction([
-      prisma.expense.create({
-        data: {
-          userId: item.userId,
-          categoryId: item.categoryId,
-          amount: item.amount,
-          description: item.description ?? undefined,
-          date: new Date(year, month - 1, item.dayOfMonth),
-          sourceRecurringId: item.id,
-        },
-      }),
-      prisma.recurringExpense.update({
-        where: { id: item.id },
-        data: { lastGeneratedMonth: month, lastGeneratedYear: year },
-      }),
-    ]);
-  }
 
   const dueIncomes = await prisma.recurringIncome.findMany({
     where: {
@@ -153,5 +223,5 @@ export async function generateDueRecurring() {
     ]);
   }
 
-  return { expenses: dueExpenses.length, incomes: dueIncomes.length };
+  return { incomes: dueIncomes.length };
 }

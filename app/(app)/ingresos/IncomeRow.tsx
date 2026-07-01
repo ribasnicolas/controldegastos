@@ -25,7 +25,7 @@ export function IncomeRow({ income, categories }: { income: Income; categories: 
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="flex items-center gap-2 flex-1 min-w-0 text-left"
+          className="flex items-center gap-2 flex-1 min-w-0 text-left tap"
         >
           <span>{income.category.icon}</span>
           <div className="min-w-0">

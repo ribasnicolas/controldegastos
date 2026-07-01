@@ -28,4 +28,12 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .card-surface {
+    @apply bg-white rounded-2xl border border-black/[0.03] shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)];
+  }
+
+  .tap {
+    @apply transition-transform duration-150 active:scale-[0.97];
+  }
 }
