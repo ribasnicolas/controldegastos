@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+// ─── Hogar (grupo opcional para ver un dashboard combinado) ──────────────────
+
+model Household {
+  id         String   @id @default(cuid())
+  name       String
+  inviteCode String   @unique @default(cuid())
+  createdAt  DateTime @default(now())
+  users      User[]
+}
+
+// ─── Usuario ───────────────────────────────────────────────────────────────
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        Role     @default(USER)
+  active      Boolean  @default(true)
+  householdId String?
+  household   Household? @relation(fields: [householdId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  expenses          Expense[]
+  incomes           Income[]
+  budgets           Budget[]
+  recurringExpenses RecurringExpense[]
+  recurringIncomes  RecurringIncome[]
+}
+
+// ─── Categorías de gasto (gestionadas desde el módulo admin) ──────────────
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  icon      String?
+  color     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  expenses          Expense[]
+  budgets           Budget[]
+  recurringExpenses RecurringExpense[]
+}
+
+// ─── Gastos ──────────────────────────────────────────────────────────────
+
+model Expense {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId         String
+  category           Category @relation(fields: [categoryId], references: [id])
+  amount             Decimal  @db.Decimal(12, 2)
+  description        String?
+  date               DateTime @default(now())
+  createdAt          DateTime @default(now())
+  sourceRecurringId  String?
+
+  @@index([userId, date])
+}
+
+// ─── Ingresos ────────────────────────────────────────────────────────────
+
+model Income {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount             Decimal  @db.Decimal(12, 2)
+  description        String?
+  date               DateTime @default(now())
+  createdAt          DateTime @default(now())
+  sourceRecurringId  String?
+
+  @@index([userId, date])
+}
+
+// ─── Presupuestos por categoría y mes ───────────────────────────────────
+
+model Budget {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  amount     Decimal  @db.Decimal(12, 2)
+  month      Int
+  year       Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, categoryId, month, year])
+}
+
+// ─── Gastos fijos recurrentes (se generan automáticamente cada mes) ──────
+
+model RecurringExpense {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId          String
+  category            Category @relation(fields: [categoryId], references: [id])
+  amount              Decimal  @db.Decimal(12, 2)
+  description         String?
+  dayOfMonth          Int
+  active              Boolean  @default(true)
+  lastGeneratedMonth  Int?
+  lastGeneratedYear   Int?
+  createdAt           DateTime @default(now())
+}
+
+// ─── Ingresos fijos recurrentes ──────────────────────────────────────────
+
+model RecurringIncome {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount              Decimal  @db.Decimal(12, 2)
+  description         String?
+  dayOfMonth          Int
+  active              Boolean  @default(true)
+  lastGeneratedMonth  Int?
+  lastGeneratedYear   Int?
+  createdAt           DateTime @default(now())
+}
