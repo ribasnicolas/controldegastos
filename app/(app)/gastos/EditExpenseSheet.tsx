@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { updateExpense } from "@/lib/actions/expenses";
 import { CategoryPicker } from "@/components/ui/CategoryPicker";
 import { IconPicker } from "@/components/ui/IconPicker";
+import { SegmentedToggle } from "@/components/ui/SegmentedToggle";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { initialActionState } from "@/lib/actions/types";
 
@@ -14,6 +15,7 @@ type Expense = {
   amount: number;
   description: string | null;
   icon: string | null;
+  paymentMethod: string;
   date: Date;
   category: { id: string };
 };
@@ -61,6 +63,18 @@ export function EditExpenseSheet({
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Ícono (opcional)</p>
             <IconPicker defaultValue={expense.icon} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Forma de pago</p>
+            <SegmentedToggle
+              name="paymentMethod"
+              defaultValue={expense.paymentMethod}
+              options={[
+                { value: "TRANSFER", label: "Transferencia" },
+                { value: "CASH", label: "Efectivo" },
+                { value: "CREDIT_CARD", label: "Tarjeta" },
+              ]}
+            />
           </div>
           <div>
             <label htmlFor={`edit-amount-${expense.id}`} className="text-sm font-medium text-gray-700">

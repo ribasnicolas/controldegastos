@@ -40,6 +40,14 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {data.creditCardExpense > 0 && (
+        <div className="card-surface p-4">
+          <p className="text-xs text-gray-500">💳 Acumulado en tarjeta este mes</p>
+          <p className="text-lg font-semibold text-gray-900">{formatCurrency(data.creditCardExpense)}</p>
+          <p className="text-xs text-gray-400 mt-1">No se descontó del disponible — se paga el mes que viene.</p>
+        </div>
+      )}
+
       {data.household && (
         <Link
           href="/hogar"

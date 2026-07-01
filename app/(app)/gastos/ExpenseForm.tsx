@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { createExpense } from "@/lib/actions/expenses";
 import { CategoryPicker } from "@/components/ui/CategoryPicker";
 import { IconPicker } from "@/components/ui/IconPicker";
+import { SegmentedToggle } from "@/components/ui/SegmentedToggle";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { initialActionState } from "@/lib/actions/types";
 import { defaultDateForMonth, monthLabel } from "@/lib/dates";
@@ -51,6 +52,18 @@ export function ExpenseForm({ categories, year, month }: { categories: Category[
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Ícono (opcional)</p>
             <IconPicker />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Forma de pago</p>
+            <SegmentedToggle
+              name="paymentMethod"
+              defaultValue="TRANSFER"
+              options={[
+                { value: "TRANSFER", label: "Transferencia" },
+                { value: "CASH", label: "Efectivo" },
+                { value: "CREDIT_CARD", label: "Tarjeta" },
+              ]}
+            />
           </div>
           <div>
             <label htmlFor="amount" className="text-sm font-medium text-gray-700">

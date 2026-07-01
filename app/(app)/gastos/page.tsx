@@ -89,6 +89,7 @@ export default async function GastosPage({
                   amount: Number(expense.amount),
                   description: expense.description,
                   icon: expense.icon,
+                  paymentMethod: expense.paymentMethod,
                   date: expense.date,
                   sourceRecurringId: expense.sourceRecurringId,
                   category: {

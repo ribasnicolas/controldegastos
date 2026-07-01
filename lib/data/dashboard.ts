@@ -18,6 +18,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     estampadosMonthIncome,
     estampadosYearExpense,
     estampadosYearIncome,
+    creditCardAgg,
   ] = await Promise.all([
     prisma.expense.groupBy({
       by: ["categoryId"],
@@ -61,6 +62,10 @@ export async function getDashboardData(userId: string, householdId: string | nul
       where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_CATEGORY } },
       _sum: { amount: true },
     }),
+    prisma.expense.aggregate({
+      where: { userId, date: { gte: start, lt: end }, paymentMethod: "CREDIT_CARD" },
+      _sum: { amount: true },
+    }),
   ]);
 
   const categoryById = new Map(categories.map((c) => [c.id, c]));
@@ -76,7 +81,9 @@ export async function getDashboardData(userId: string, householdId: string | nul
 
   const totalExpense = expensesBreakdown.reduce((sum, row) => sum + row.amount, 0);
   const totalIncome = Number(incomeAgg._sum.amount ?? 0);
-  const available = totalIncome - totalExpense;
+  const creditCardExpense = Number(creditCardAgg._sum.amount ?? 0);
+  // La tarjeta de crédito no descuenta del saldo disponible: se paga el mes que viene.
+  const available = totalIncome - (totalExpense - creditCardExpense);
 
   const budgetsBreakdown = budgets.map((budget) => {
     const spent = expensesBreakdown.find((row) => row.categoryId === budget.categoryId)?.amount ?? 0;
@@ -104,7 +111,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
 
   let household: { name: string; totalIncome: number; totalExpense: number; available: number } | null = null;
   if (householdId) {
-    const [householdIncome, householdExpense, householdInfo] = await Promise.all([
+    const [householdIncome, householdExpense, householdCreditCard, householdInfo] = await Promise.all([
       prisma.income.aggregate({
         where: { date: { gte: start, lt: end }, user: { householdId } },
         _sum: { amount: true },
@@ -113,15 +120,20 @@ export async function getDashboardData(userId: string, householdId: string | nul
         where: { date: { gte: start, lt: end }, user: { householdId } },
         _sum: { amount: true },
       }),
+      prisma.expense.aggregate({
+        where: { date: { gte: start, lt: end }, user: { householdId }, paymentMethod: "CREDIT_CARD" },
+        _sum: { amount: true },
+      }),
       prisma.household.findUnique({ where: { id: householdId } }),
     ]);
     const hIncome = Number(householdIncome._sum.amount ?? 0);
     const hExpense = Number(householdExpense._sum.amount ?? 0);
+    const hCreditCard = Number(householdCreditCard._sum.amount ?? 0);
     household = {
       name: householdInfo?.name ?? "Hogar",
       totalIncome: hIncome,
       totalExpense: hExpense,
-      available: hIncome - hExpense,
+      available: hIncome - (hExpense - hCreditCard),
     };
   }
 
@@ -131,6 +143,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     totalIncome,
     totalExpense,
     available,
+    creditCardExpense,
     expensesBreakdown,
     budgetsBreakdown,
     recentExpenses,

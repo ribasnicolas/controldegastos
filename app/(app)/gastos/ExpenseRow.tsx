@@ -12,6 +12,7 @@ type Expense = {
   amount: number;
   description: string | null;
   icon: string | null;
+  paymentMethod: string;
   date: Date;
   sourceRecurringId: string | null;
   category: { id: string; name: string; icon: string | null };
@@ -34,6 +35,7 @@ export function ExpenseRow({ expense, categories }: { expense: Expense; categori
             <p className="text-xs text-gray-500 truncate">
               {expense.category.name} · {formatDate(expense.date)}
               {expense.sourceRecurringId ? " · fijo" : ""}
+              {expense.paymentMethod === "CREDIT_CARD" ? " · 💳 tarjeta" : ""}
             </p>
           </div>
         </button>

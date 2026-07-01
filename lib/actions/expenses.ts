@@ -11,6 +11,7 @@ const expenseSchema = z.object({
   amount: z.coerce.number().positive("El monto debe ser mayor a 0"),
   description: z.string().max(200).optional(),
   icon: z.string().max(10).optional(),
+  paymentMethod: z.enum(["CASH", "TRANSFER", "CREDIT_CARD"]).default("TRANSFER"),
   date: z.string().optional(),
 });
 
@@ -25,6 +26,7 @@ export async function createExpense(_prev: ActionState, formData: FormData): Pro
     amount: formData.get("amount"),
     description: formData.get("description") || undefined,
     icon: formData.get("icon") || undefined,
+    paymentMethod: formData.get("paymentMethod") || undefined,
     date: formData.get("date") || undefined,
   });
   if (!parsed.success) {
@@ -38,6 +40,7 @@ export async function createExpense(_prev: ActionState, formData: FormData): Pro
       amount: parsed.data.amount,
       description: parsed.data.description,
       icon: parsed.data.icon,
+      paymentMethod: parsed.data.paymentMethod,
       date: parsed.data.date ? new Date(parsed.data.date) : new Date(),
     },
   });
@@ -55,6 +58,7 @@ export async function updateExpense(_prev: ActionState, formData: FormData): Pro
     amount: formData.get("amount"),
     description: formData.get("description") || undefined,
     icon: formData.get("icon") || undefined,
+    paymentMethod: formData.get("paymentMethod") || undefined,
     date: formData.get("date") || undefined,
   });
   if (!parsed.success) {
@@ -68,6 +72,7 @@ export async function updateExpense(_prev: ActionState, formData: FormData): Pro
       amount: parsed.data.amount,
       description: parsed.data.description ?? null,
       icon: parsed.data.icon ?? null,
+      paymentMethod: parsed.data.paymentMethod,
       date: parsed.data.date ? new Date(parsed.data.date) : undefined,
     },
   });
