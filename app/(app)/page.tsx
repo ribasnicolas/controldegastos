@@ -27,6 +27,34 @@ export default async function DashboardPage() {
             {formatCurrency(data.available)}
           </p>
         </div>
+
+        {data.pendingFixedTotal > 0 && (
+          <div className="mt-2 card-surface p-4 space-y-2">
+            <p className="text-xs text-gray-500">
+              Faltan descontar los gastos fijos que aún no fueron pagados
+            </p>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Total pendiente</span>
+              <span className="font-semibold text-brand-secondary-dark">
+                {formatCurrency(data.pendingFixedTotal)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
+              <span className="text-gray-600">Saldo real</span>
+              <span className="font-semibold text-gray-900">{formatCurrency(data.available)}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Saldo si pagás los gastos fijos</span>
+              <span
+                className={`font-semibold ${
+                  data.projectedAvailable >= 0 ? "text-brand-primary-dark" : "text-brand-danger"
+                }`}
+              >
+                {formatCurrency(data.projectedAvailable)}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">

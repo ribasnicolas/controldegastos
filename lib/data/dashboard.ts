@@ -19,6 +19,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     estampadosYearExpense,
     estampadosYearIncome,
     creditCardAgg,
+    activeRecurringExpenses,
   ] = await Promise.all([
     prisma.expense.groupBy({
       by: ["categoryId"],
@@ -66,6 +67,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
       where: { userId, date: { gte: start, lt: end }, paymentMethod: "CREDIT_CARD" },
       _sum: { amount: true },
     }),
+    prisma.recurringExpense.findMany({ where: { userId, active: true } }),
   ]);
 
   const categoryById = new Map(categories.map((c) => [c.id, c]));
@@ -84,6 +86,12 @@ export async function getDashboardData(userId: string, householdId: string | nul
   const creditCardExpense = Number(creditCardAgg._sum.amount ?? 0);
   // La tarjeta de crédito no descuenta del saldo disponible: se paga el mes que viene.
   const available = totalIncome - (totalExpense - creditCardExpense);
+
+  // Gastos fijos activos que todavía no fueron confirmados como pagados este mes.
+  const pendingFixedTotal = activeRecurringExpenses
+    .filter((item) => !(item.lastGeneratedMonth === month && item.lastGeneratedYear === year))
+    .reduce((sum, item) => sum + Number(item.amount), 0);
+  const projectedAvailable = available - pendingFixedTotal;
 
   const budgetsBreakdown = budgets.map((budget) => {
     const spent = expensesBreakdown.find((row) => row.categoryId === budget.categoryId)?.amount ?? 0;
@@ -144,6 +152,8 @@ export async function getDashboardData(userId: string, householdId: string | nul
     totalExpense,
     available,
     creditCardExpense,
+    pendingFixedTotal,
+    projectedAvailable,
     expensesBreakdown,
     budgetsBreakdown,
     recentExpenses,
