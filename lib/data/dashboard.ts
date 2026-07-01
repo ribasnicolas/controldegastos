@@ -20,6 +20,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     estampadosYearIncome,
     creditCardAgg,
     activeRecurringExpenses,
+    debtsAgg,
   ] = await Promise.all([
     prisma.expense.groupBy({
       by: ["categoryId"],
@@ -68,6 +69,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
       _sum: { amount: true },
     }),
     prisma.recurringExpense.findMany({ where: { userId, active: true } }),
+    prisma.debt.aggregate({ where: { userId, settled: false }, _sum: { amount: true } }),
   ]);
 
   const categoryById = new Map(categories.map((c) => [c.id, c]));
@@ -92,6 +94,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     .filter((item) => !(item.lastGeneratedMonth === month && item.lastGeneratedYear === year))
     .reduce((sum, item) => sum + Number(item.amount), 0);
   const projectedAvailable = available - pendingFixedTotal;
+  const debtsPending = Number(debtsAgg._sum.amount ?? 0);
 
   const budgetsBreakdown = budgets.map((budget) => {
     const spent = expensesBreakdown.find((row) => row.categoryId === budget.categoryId)?.amount ?? 0;
@@ -154,6 +157,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     creditCardExpense,
     pendingFixedTotal,
     projectedAvailable,
+    debtsPending,
     expensesBreakdown,
     budgetsBreakdown,
     recentExpenses,
