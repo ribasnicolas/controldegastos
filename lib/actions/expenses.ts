@@ -10,6 +10,7 @@ const expenseSchema = z.object({
   categoryId: z.string().min(1, "Elegí una categoría"),
   amount: z.coerce.number().positive("El monto debe ser mayor a 0"),
   description: z.string().max(200).optional(),
+  icon: z.string().max(10).optional(),
   date: z.string().optional(),
 });
 
@@ -23,6 +24,7 @@ export async function createExpense(_prev: ActionState, formData: FormData): Pro
     categoryId: formData.get("categoryId"),
     amount: formData.get("amount"),
     description: formData.get("description") || undefined,
+    icon: formData.get("icon") || undefined,
     date: formData.get("date") || undefined,
   });
   if (!parsed.success) {
@@ -35,6 +37,7 @@ export async function createExpense(_prev: ActionState, formData: FormData): Pro
       categoryId: parsed.data.categoryId,
       amount: parsed.data.amount,
       description: parsed.data.description,
+      icon: parsed.data.icon,
       date: parsed.data.date ? new Date(parsed.data.date) : new Date(),
     },
   });
@@ -51,6 +54,7 @@ export async function updateExpense(_prev: ActionState, formData: FormData): Pro
     categoryId: formData.get("categoryId"),
     amount: formData.get("amount"),
     description: formData.get("description") || undefined,
+    icon: formData.get("icon") || undefined,
     date: formData.get("date") || undefined,
   });
   if (!parsed.success) {
@@ -63,6 +67,7 @@ export async function updateExpense(_prev: ActionState, formData: FormData): Pro
       categoryId: parsed.data.categoryId,
       amount: parsed.data.amount,
       description: parsed.data.description ?? null,
+      icon: parsed.data.icon ?? null,
       date: parsed.data.date ? new Date(parsed.data.date) : undefined,
     },
   });

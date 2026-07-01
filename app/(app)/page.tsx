@@ -55,14 +55,19 @@ export default async function DashboardPage() {
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">Gastos por categoría</h2>
         <div className="card-surface p-4">
-          <ExpensePieChart data={data.expensesBreakdown} />
-          <ul className="mt-2 space-y-2">
+          <ExpensePieChart data={data.expensesBreakdown} year={data.year} month={data.month} />
+          <ul className="mt-2 space-y-1">
             {data.expensesBreakdown.map((row) => (
-              <li key={row.categoryId} className="flex items-center justify-between text-sm">
-                <span className="text-gray-700">
-                  {row.icon} {row.name}
-                </span>
-                <span className="font-medium text-gray-900">{formatCurrency(row.amount)}</span>
+              <li key={row.categoryId}>
+                <Link
+                  href={`/gastos?y=${data.year}&m=${data.month}&categoryId=${row.categoryId}`}
+                  className="flex items-center justify-between text-sm py-1.5 tap"
+                >
+                  <span className="text-gray-700">
+                    {row.icon} {row.name}
+                  </span>
+                  <span className="font-medium text-gray-900">{formatCurrency(row.amount)}</span>
+                </Link>
               </li>
             ))}
           </ul>
@@ -133,14 +138,14 @@ export default async function DashboardPage() {
             ...data.recentExpenses.map((e) => ({
               id: e.id,
               label: e.description || e.category.name,
-              icon: e.category.icon ?? "💸",
+              icon: e.icon || e.category.icon || "💸",
               amount: -Number(e.amount),
               date: e.date,
             })),
             ...data.recentIncomes.map((i) => ({
               id: i.id,
               label: i.description || i.category.name,
-              icon: i.category.icon ?? "💰",
+              icon: i.icon || i.category.icon || "💰",
               amount: Number(i.amount),
               date: i.date,
             })),

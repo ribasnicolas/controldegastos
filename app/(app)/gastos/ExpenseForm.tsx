@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { createExpense } from "@/lib/actions/expenses";
 import { CategoryPicker } from "@/components/ui/CategoryPicker";
+import { IconPicker } from "@/components/ui/IconPicker";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { initialActionState } from "@/lib/actions/types";
 
@@ -41,6 +42,10 @@ export function ExpenseForm({ categories }: { categories: Category[] }) {
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Categoría</p>
             <CategoryPicker categories={categories} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Ícono (opcional)</p>
+            <IconPicker />
           </div>
           <div>
             <label htmlFor="amount" className="text-sm font-medium text-gray-700">

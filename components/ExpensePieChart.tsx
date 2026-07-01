@@ -1,11 +1,16 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { formatCurrency } from "@/lib/format";
 
 const COLORS = ["#059669", "#f59e0b", "#3b82f6", "#8b5cf6", "#f43f8e", "#ef4444", "#14b8a6", "#84cc16"];
 
-export function ExpensePieChart({ data }: { data: { name: string; amount: number }[] }) {
+type Row = { categoryId: string; name: string; amount: number };
+
+export function ExpensePieChart({ data, year, month }: { data: Row[]; year: number; month: number }) {
+  const router = useRouter();
+
   if (data.length === 0) {
     return (
       <div className="h-48 flex items-center justify-center text-sm text-gray-500">
@@ -26,9 +31,13 @@ export function ExpensePieChart({ data }: { data: { name: string; amount: number
             outerRadius={85}
             paddingAngle={3}
             cornerRadius={6}
+            onClick={(entry) => {
+              const categoryId = (entry as unknown as Row).categoryId;
+              router.push(`/gastos?y=${year}&m=${month}&categoryId=${categoryId}`);
+            }}
           >
             {data.map((entry, index) => (
-              <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+              <Cell key={entry.categoryId} fill={COLORS[index % COLORS.length]} cursor="pointer" />
             ))}
           </Pie>
           <Tooltip formatter={(value) => formatCurrency(Number(value))} />

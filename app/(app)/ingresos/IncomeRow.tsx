@@ -11,6 +11,7 @@ type Income = {
   id: string;
   amount: number;
   description: string | null;
+  icon: string | null;
   date: Date;
   sourceRecurringId: string | null;
   category: { id: string; name: string; icon: string | null };
@@ -27,7 +28,7 @@ export function IncomeRow({ income, categories }: { income: Income; categories: 
           onClick={() => setEditing(true)}
           className="flex items-center gap-2 flex-1 min-w-0 text-left tap"
         >
-          <span>{income.category.icon}</span>
+          <span>{income.icon || income.category.icon}</span>
           <div className="min-w-0">
             <p className="text-sm text-gray-900 truncate">{income.description || income.category.name}</p>
             <p className="text-xs text-gray-500 truncate">

@@ -80,7 +80,7 @@ export function RecurringExpenses({ categories, items }: { categories: Category[
                       <p className="text-xs text-gray-500 truncate">
                         Día {item.dayOfMonth} · {formatCurrency(Number(item.amount))}
                         {pending && <span className="text-brand-secondary-dark font-medium"> · Pendiente de pago</span>}
-                        {isDue && isConfirmed && <span className="text-brand-primary-dark font-medium"> · Pagado este mes</span>}
+                        {isDue && isConfirmed && <span className="text-brand-primary-dark font-medium"> · ✓ Pagado este mes</span>}
                       </p>
                     </button>
                     <div className="flex items-center gap-2 shrink-0">

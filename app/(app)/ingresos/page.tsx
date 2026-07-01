@@ -6,6 +6,7 @@ import { IncomeForm } from "./IncomeForm";
 import { RecurringIncomes } from "./RecurringIncomes";
 import { IncomeRow } from "./IncomeRow";
 import { MonthNav } from "@/components/ui/MonthNav";
+import { CollapsibleCard } from "@/components/ui/CollapsibleCard";
 
 export default async function IngresosPage({
   searchParams,
@@ -52,9 +53,12 @@ export default async function IngresosPage({
         }))}
       />
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-700">Ingresos de {monthLabel(month, year).toLowerCase()}</h2>
-        <div className="card-surface divide-y divide-gray-100">
+      <CollapsibleCard
+        title={`Ingresos de ${monthLabel(month, year).toLowerCase()}`}
+        count={incomes.length}
+        defaultOpen
+      >
+        <div className="divide-y divide-gray-100">
           {incomes.map((income) => (
             <IncomeRow
               key={income.id}
@@ -63,6 +67,7 @@ export default async function IngresosPage({
                 id: income.id,
                 amount: Number(income.amount),
                 description: income.description,
+                icon: income.icon,
                 date: income.date,
                 sourceRecurringId: income.sourceRecurringId,
                 category: {
@@ -77,7 +82,7 @@ export default async function IngresosPage({
             <p className="px-4 py-6 text-sm text-gray-500 text-center">Todavía no cargaste ingresos este mes.</p>
           )}
         </div>
-      </section>
+      </CollapsibleCard>
     </div>
   );
 }

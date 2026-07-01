@@ -4,6 +4,7 @@ import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { updateExpense } from "@/lib/actions/expenses";
 import { CategoryPicker } from "@/components/ui/CategoryPicker";
+import { IconPicker } from "@/components/ui/IconPicker";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { initialActionState } from "@/lib/actions/types";
 
@@ -12,6 +13,7 @@ type Expense = {
   id: string;
   amount: number;
   description: string | null;
+  icon: string | null;
   date: Date;
   category: { id: string };
 };
@@ -55,6 +57,10 @@ export function EditExpenseSheet({
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Categoría</p>
             <CategoryPicker categories={categories} defaultValue={expense.category.id} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Ícono (opcional)</p>
+            <IconPicker defaultValue={expense.icon} />
           </div>
           <div>
             <label htmlFor={`edit-amount-${expense.id}`} className="text-sm font-medium text-gray-700">
