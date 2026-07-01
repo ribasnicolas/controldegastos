@@ -144,18 +144,29 @@ export async function deleteRecurringIncome(id: string) {
  * El usuario confirma que un gasto fijo ya vencido este mes fue pagado:
  * recién en este momento se crea el Expense real y se descuenta del total.
  */
-export async function confirmRecurringExpensePayment(id: string) {
+export async function confirmRecurringExpensePayment(
+  id: string,
+  _prev: ActionState,
+  _formData: FormData,
+): Promise<ActionState> {
   const user = await requireUser();
   const now = new Date();
   const day = now.getDate();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  const item = await prisma.recurringExpense.findFirstOrThrow({ where: { id, userId: user.id } });
-
-  const alreadyConfirmed = item.lastGeneratedMonth === month && item.lastGeneratedYear === year;
-  if (!item.active || item.dayOfMonth > day || alreadyConfirmed) {
-    return;
+  const item = await prisma.recurringExpense.findFirst({ where: { id, userId: user.id } });
+  if (!item) {
+    return { error: "No se encontró el gasto fijo" };
+  }
+  if (!item.active) {
+    return { error: "Este gasto fijo está pausado" };
+  }
+  if (item.dayOfMonth > day) {
+    return { error: `Todavía no llegó el día ${item.dayOfMonth}` };
+  }
+  if (item.lastGeneratedMonth === month && item.lastGeneratedYear === year) {
+    return { error: "Ya estaba marcado como pagado este mes" };
   }
 
   await prisma.$transaction([
@@ -177,6 +188,43 @@ export async function confirmRecurringExpensePayment(id: string) {
 
   revalidatePath("/gastos");
   revalidatePath("/");
+  return { success: true };
+}
+
+/**
+ * Deshace la confirmación de pago de un gasto fijo: borra el Expense que se
+ * generó al confirmar (si todavía existe) y vuelve a dejarlo pendiente.
+ */
+export async function undoRecurringExpensePayment(
+  id: string,
+  _prev: ActionState,
+  _formData: FormData,
+): Promise<ActionState> {
+  const user = await requireUser();
+  const item = await prisma.recurringExpense.findFirst({ where: { id, userId: user.id } });
+  if (!item) {
+    return { error: "No se encontró el gasto fijo" };
+  }
+  if (item.lastGeneratedMonth == null || item.lastGeneratedYear == null) {
+    return { error: "Este gasto fijo no está marcado como pagado" };
+  }
+
+  const monthStart = new Date(item.lastGeneratedYear, item.lastGeneratedMonth - 1, 1);
+  const monthEnd = new Date(item.lastGeneratedYear, item.lastGeneratedMonth, 1);
+
+  await prisma.$transaction([
+    prisma.expense.deleteMany({
+      where: { userId: user.id, sourceRecurringId: item.id, date: { gte: monthStart, lt: monthEnd } },
+    }),
+    prisma.recurringExpense.update({
+      where: { id: item.id },
+      data: { lastGeneratedMonth: null, lastGeneratedYear: null },
+    }),
+  ]);
+
+  revalidatePath("/gastos");
+  revalidatePath("/");
+  return { success: true };
 }
 
 /**

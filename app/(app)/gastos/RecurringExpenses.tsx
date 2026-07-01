@@ -7,6 +7,7 @@ import {
   createRecurringExpense,
   deleteRecurringExpense,
   toggleRecurringExpense,
+  undoRecurringExpensePayment,
 } from "@/lib/actions/recurring";
 import { CategoryPicker } from "@/components/ui/CategoryPicker";
 import { SubmitButton } from "@/components/ui/SubmitButton";
@@ -26,6 +27,95 @@ type Recurring = {
   lastGeneratedYear: number | null;
   category: { id: string; name: string; icon: string | null };
 };
+
+function RecurringExpenseItem({
+  item,
+  day,
+  month,
+  year,
+  onEdit,
+}: {
+  item: Recurring;
+  day: number;
+  month: number;
+  year: number;
+  onEdit: () => void;
+}) {
+  const [state, confirmAction] = useActionState(
+    confirmRecurringExpensePayment.bind(null, item.id),
+    initialActionState,
+  );
+  const [undoState, undoAction] = useActionState(
+    undoRecurringExpensePayment.bind(null, item.id),
+    initialActionState,
+  );
+
+  useEffect(() => {
+    if (state.success) toast.success("Gasto marcado como pagado");
+    if (state.error) toast.error(state.error);
+  }, [state]);
+
+  useEffect(() => {
+    if (undoState.success) toast.success("Pago deshecho");
+    if (undoState.error) toast.error(undoState.error);
+  }, [undoState]);
+
+  const isDue = item.active && item.dayOfMonth <= day;
+  const isConfirmed = item.lastGeneratedMonth === month && item.lastGeneratedYear === year;
+  const pending = isDue && !isConfirmed;
+
+  return (
+    <div className="flex items-center justify-between px-4 py-3 gap-2">
+      <button type="button" onClick={onEdit} className="flex-1 min-w-0 text-left tap">
+        <p className="text-sm text-gray-900 truncate">
+          {item.category.icon} {item.description || item.category.name}
+        </p>
+        <p className="text-xs text-gray-500 truncate">
+          Día {item.dayOfMonth} · {formatCurrency(Number(item.amount))}
+          {item.active && isConfirmed && (
+            <span className="text-brand-primary-dark font-medium"> · ✓ Pagado este mes</span>
+          )}
+          {pending && <span className="text-brand-secondary-dark font-medium"> · Pendiente de pago</span>}
+          {item.active && !isDue && !isConfirmed && <span className="text-gray-400"> · No pagado</span>}
+        </p>
+      </button>
+      <div className="flex items-center gap-2 shrink-0">
+        {pending && (
+          <form action={confirmAction}>
+            <button
+              type="submit"
+              className="h-8 px-3 rounded-full text-xs font-medium bg-brand-secondary/15 text-brand-secondary-dark tap"
+            >
+              Marcar pagado
+            </button>
+          </form>
+        )}
+        {item.active && isConfirmed && (
+          <ConfirmDeleteForm
+            action={undoAction}
+            confirmMessage="¿Deshacer el pago? Se borra el gasto que se generó al confirmarlo."
+            className="h-8 px-3 rounded-full text-xs font-medium bg-gray-100 text-gray-500 tap"
+          >
+            Deshacer
+          </ConfirmDeleteForm>
+        )}
+        <form action={toggleRecurringExpense.bind(null, item.id)}>
+          <button
+            type="submit"
+            className={`h-8 px-3 rounded-full text-xs font-medium tap ${
+              item.active ? "bg-brand-primary/10 text-brand-primary-dark" : "bg-gray-100 text-gray-500"
+            }`}
+          >
+            {item.active ? "Activo" : "Pausado"}
+          </button>
+        </form>
+        <ConfirmDeleteForm action={deleteRecurringExpense.bind(null, item.id)} confirmMessage="¿Eliminar este gasto fijo?">
+          ✕
+        </ConfirmDeleteForm>
+      </div>
+    </div>
+  );
+}
 
 export function RecurringExpenses({ categories, items }: { categories: Category[]; items: Recurring[] }) {
   const [state, formAction] = useActionState(createRecurringExpense, initialActionState);
@@ -63,57 +153,16 @@ export function RecurringExpenses({ categories, items }: { categories: Category[
         <div className="border-t border-gray-100 p-4 space-y-4">
           {items.length > 0 && (
             <div className="rounded-2xl border border-gray-100 divide-y divide-gray-100">
-              {items.map((item) => {
-                const isDue = item.active && item.dayOfMonth <= day;
-                const isConfirmed = item.lastGeneratedMonth === month && item.lastGeneratedYear === year;
-                const pending = isDue && !isConfirmed;
-                return (
-                  <div key={item.id} className="flex items-center justify-between px-4 py-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setEditing(item)}
-                      className="flex-1 min-w-0 text-left tap"
-                    >
-                      <p className="text-sm text-gray-900 truncate">
-                        {item.category.icon} {item.description || item.category.name}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        Día {item.dayOfMonth} · {formatCurrency(Number(item.amount))}
-                        {pending && <span className="text-brand-secondary-dark font-medium"> · Pendiente de pago</span>}
-                        {isDue && isConfirmed && <span className="text-brand-primary-dark font-medium"> · ✓ Pagado este mes</span>}
-                      </p>
-                    </button>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {pending && (
-                        <form action={confirmRecurringExpensePayment.bind(null, item.id)}>
-                          <button
-                            type="submit"
-                            className="h-8 px-3 rounded-full text-xs font-medium bg-brand-secondary/15 text-brand-secondary-dark tap"
-                          >
-                            Marcar pagado
-                          </button>
-                        </form>
-                      )}
-                      <form action={toggleRecurringExpense.bind(null, item.id)}>
-                        <button
-                          type="submit"
-                          className={`h-8 px-3 rounded-full text-xs font-medium tap ${
-                            item.active ? "bg-brand-primary/10 text-brand-primary-dark" : "bg-gray-100 text-gray-500"
-                          }`}
-                        >
-                          {item.active ? "Activo" : "Pausado"}
-                        </button>
-                      </form>
-                      <ConfirmDeleteForm
-                        action={deleteRecurringExpense.bind(null, item.id)}
-                        confirmMessage="¿Eliminar este gasto fijo?"
-                      >
-                        ✕
-                      </ConfirmDeleteForm>
-                    </div>
-                  </div>
-                );
-              })}
+              {items.map((item) => (
+                <RecurringExpenseItem
+                  key={item.id}
+                  item={item}
+                  day={day}
+                  month={month}
+                  year={year}
+                  onEdit={() => setEditing(item)}
+                />
+              ))}
             </div>
           )}
 

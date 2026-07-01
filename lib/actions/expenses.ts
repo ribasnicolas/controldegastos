@@ -82,7 +82,25 @@ export async function updateExpense(_prev: ActionState, formData: FormData): Pro
 
 export async function deleteExpense(id: string) {
   const user = await requireUser();
-  await prisma.expense.deleteMany({ where: { id, userId: user.id } });
+  const expense = await prisma.expense.findFirst({ where: { id, userId: user.id } });
+  if (!expense) return;
+
+  await prisma.expense.delete({ where: { id: expense.id } });
+
+  // Si este gasto vino de un gasto fijo confirmado, lo dejamos de nuevo como
+  // pendiente de pago en vez de que quede marcado "pagado" sin el gasto real.
+  if (expense.sourceRecurringId) {
+    await prisma.recurringExpense.updateMany({
+      where: {
+        id: expense.sourceRecurringId,
+        userId: user.id,
+        lastGeneratedMonth: expense.date.getMonth() + 1,
+        lastGeneratedYear: expense.date.getFullYear(),
+      },
+      data: { lastGeneratedMonth: null, lastGeneratedYear: null },
+    });
+  }
+
   revalidatePath("/");
   revalidatePath("/gastos");
 }
