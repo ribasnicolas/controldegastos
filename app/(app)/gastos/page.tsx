@@ -46,7 +46,7 @@ export default async function GastosPage({
       <h1 className="text-xl font-bold text-gray-900">Gastos</h1>
       <MonthNav basePath="/gastos" year={year} month={month} />
 
-      <ExpenseForm categories={categories} />
+      <ExpenseForm key={`${year}-${month}`} categories={categories} year={year} month={month} />
 
       <RecurringExpenses
         categories={categories}

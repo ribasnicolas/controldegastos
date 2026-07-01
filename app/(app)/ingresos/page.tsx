@@ -39,7 +39,7 @@ export default async function IngresosPage({
       <h1 className="text-xl font-bold text-gray-900">Ingresos</h1>
       <MonthNav basePath="/ingresos" year={year} month={month} />
 
-      <IncomeForm categories={categories} />
+      <IncomeForm key={`${year}-${month}`} categories={categories} year={year} month={month} />
 
       <RecurringIncomes
         categories={categories}

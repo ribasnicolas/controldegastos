@@ -176,7 +176,7 @@ export async function confirmRecurringExpensePayment(
         categoryId: item.categoryId,
         amount: item.amount,
         description: item.description ?? undefined,
-        date: new Date(year, month - 1, item.dayOfMonth),
+        date: now,
         sourceRecurringId: item.id,
       },
     }),

@@ -11,7 +11,10 @@ export function MonthNav({
   month: number;
 }) {
   const now = new Date();
-  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const isCurrentMonth = year === currentYear && month === currentMonth;
+  const isFuture = year > currentYear || (year === currentYear && month > currentMonth);
   const prev = shiftMonth(year, month, -1);
   const next = shiftMonth(year, month, 1);
 
@@ -26,23 +29,20 @@ export function MonthNav({
       </Link>
       <div className="text-center">
         <p className="text-sm font-medium text-gray-900">{monthLabel(month, year)}</p>
+        {isFuture && <p className="text-xs text-brand-secondary-dark font-medium">Planificando</p>}
         {!isCurrentMonth && (
           <Link href={basePath} className="text-xs text-brand-primary font-medium">
             Volver a este mes
           </Link>
         )}
       </div>
-      {isCurrentMonth ? (
-        <span className="h-9 w-9 flex items-center justify-center text-gray-300">›</span>
-      ) : (
-        <Link
-          href={`${basePath}?y=${next.year}&m=${next.month}`}
-          className="tap h-9 w-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
-          aria-label="Mes siguiente"
-        >
-          ›
-        </Link>
-      )}
+      <Link
+        href={`${basePath}?y=${next.year}&m=${next.month}`}
+        className="tap h-9 w-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
+        aria-label="Mes siguiente"
+      >
+        ›
+      </Link>
     </div>
   );
 }

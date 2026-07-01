@@ -7,13 +7,16 @@ import { CategoryPicker } from "@/components/ui/CategoryPicker";
 import { IconPicker } from "@/components/ui/IconPicker";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { initialActionState } from "@/lib/actions/types";
+import { defaultDateForMonth, monthLabel } from "@/lib/dates";
 
 type Category = { id: string; name: string; icon: string | null };
 
-export function ExpenseForm({ categories }: { categories: Category[] }) {
+export function ExpenseForm({ categories, year, month }: { categories: Category[]; year: number; month: number }) {
   const [state, formAction] = useActionState(createExpense, initialActionState);
   const [open, setOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const now = new Date();
+  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
 
   useEffect(() => {
     if (state.success) {
@@ -29,7 +32,9 @@ export function ExpenseForm({ categories }: { categories: Category[] }) {
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 text-left tap"
       >
-        <span className="text-sm font-semibold text-gray-700">Cargar gasto</span>
+        <span className="text-sm font-semibold text-gray-700">
+          {isCurrentMonth ? "Cargar gasto" : `Cargar gasto de ${monthLabel(month, year).toLowerCase()}`}
+        </span>
         <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "+ Cargar gasto"}</span>
       </button>
 
@@ -73,6 +78,18 @@ export function ExpenseForm({ categories }: { categories: Category[] }) {
               type="text"
               maxLength={200}
               placeholder="Ej: Supermercado"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+          </div>
+          <div>
+            <label htmlFor="date" className="text-sm font-medium text-gray-700">
+              Fecha
+            </label>
+            <input
+              id="date"
+              name="date"
+              type="date"
+              defaultValue={defaultDateForMonth(year, month)}
               className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
             />
           </div>
