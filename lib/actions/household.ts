@@ -31,7 +31,9 @@ export async function joinHousehold(_prev: ActionState, formData: FormData): Pro
     return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
   }
 
-  const household = await prisma.household.findUnique({ where: { inviteCode: parsed.data.inviteCode.trim() } });
+  const household = await prisma.household.findFirst({
+    where: { inviteCode: { equals: parsed.data.inviteCode.trim(), mode: "insensitive" } },
+  });
   if (!household) {
     return { error: "No existe ningún hogar con ese código" };
   }

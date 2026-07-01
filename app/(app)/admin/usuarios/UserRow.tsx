@@ -33,7 +33,7 @@ export function UserRow({
           defaultValue={role}
           disabled={isSelf || isPending}
           onChange={(e) => startTransition(() => changeUserRole(id, e.target.value as "ADMIN" | "USER"))}
-          className="h-9 rounded-lg border border-gray-300 px-2 text-xs disabled:opacity-50"
+          className="h-9 rounded-lg border border-gray-300 px-2 text-sm disabled:opacity-50"
         >
           <option value="USER">Usuario</option>
           <option value="ADMIN">Admin</option>

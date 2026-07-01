@@ -36,7 +36,7 @@ export function BudgetRow({
           min="0"
           defaultValue={currentAmount || undefined}
           placeholder="0"
-          className="w-28 h-10 rounded-lg border border-gray-300 px-3 text-right text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+          className="w-28 h-10 rounded-lg border border-gray-300 px-3 text-right text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
         />
         <button type="submit" className="h-10 px-3 rounded-lg bg-brand-primary/10 text-brand-primary-dark text-sm font-medium">
           Guardar

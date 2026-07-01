@@ -37,6 +37,9 @@ export function CreateJoinForms() {
           type="text"
           placeholder="Código de invitación"
           required
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
         />
         {joinState.error && <p className="text-sm text-brand-danger">{joinState.error}</p>}

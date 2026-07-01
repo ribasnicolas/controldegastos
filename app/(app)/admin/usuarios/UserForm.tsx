@@ -32,6 +32,9 @@ export function UserForm() {
         type="email"
         placeholder="Email"
         required
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
         className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
       />
       <input
@@ -40,6 +43,9 @@ export function UserForm() {
         placeholder="Contraseña"
         required
         minLength={6}
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
         className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
       />
       <select
