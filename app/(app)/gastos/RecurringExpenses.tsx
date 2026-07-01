@@ -15,7 +15,7 @@ import { initialActionState } from "@/lib/actions/types";
 type Category = { id: string; name: string; icon: string | null };
 type Recurring = {
   id: string;
-  amount: unknown;
+  amount: number;
   description: string | null;
   dayOfMonth: number;
   active: boolean;

@@ -7,19 +7,22 @@ import {
   deleteRecurringIncome,
   toggleRecurringIncome,
 } from "@/lib/actions/recurring";
+import { CategoryPicker } from "@/components/ui/CategoryPicker";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { formatCurrency } from "@/lib/format";
 import { initialActionState } from "@/lib/actions/types";
 
+type Category = { id: string; name: string; icon: string | null };
 type Recurring = {
   id: string;
-  amount: unknown;
+  amount: number;
   description: string | null;
   dayOfMonth: number;
   active: boolean;
+  category: { name: string; icon: string | null };
 };
 
-export function RecurringIncomes({ items }: { items: Recurring[] }) {
+export function RecurringIncomes({ categories, items }: { categories: Category[]; items: Recurring[] }) {
   const [state, formAction] = useActionState(createRecurringIncome, initialActionState);
   const [open, setOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -45,7 +48,9 @@ export function RecurringIncomes({ items }: { items: Recurring[] }) {
           {items.map((item) => (
             <div key={item.id} className="flex items-center justify-between px-4 py-3">
               <div>
-                <p className="text-sm text-gray-900">{item.description || "Ingreso fijo"}</p>
+                <p className="text-sm text-gray-900">
+                  {item.category.icon} {item.description || item.category.name}
+                </p>
                 <p className="text-xs text-gray-500">
                   Día {item.dayOfMonth} · {formatCurrency(Number(item.amount))}
                 </p>
@@ -74,6 +79,10 @@ export function RecurringIncomes({ items }: { items: Recurring[] }) {
 
       {open && (
         <form ref={formRef} action={formAction} className="space-y-4 rounded-2xl bg-white border border-gray-200 p-4">
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Categoría</p>
+            <CategoryPicker categories={categories} />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="rec-amount" className="text-sm font-medium text-gray-700">

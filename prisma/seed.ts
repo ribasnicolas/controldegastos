@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const DEFAULT_CATEGORIES = [
+const DEFAULT_EXPENSE_CATEGORIES = [
   { name: "Comida", icon: "🛒" },
   { name: "Transporte", icon: "🚗" },
   { name: "Vivienda", icon: "🏠" },
@@ -12,18 +12,34 @@ const DEFAULT_CATEGORIES = [
   { name: "Ocio", icon: "🎉" },
   { name: "Educación", icon: "📚" },
   { name: "Ropa", icon: "👕" },
+  { name: "Actividades", icon: "⚽" },
   { name: "Otros", icon: "📦" },
-];
+] as const;
+
+const DEFAULT_INCOME_CATEGORIES = [
+  { name: "Sueldo", icon: "💼" },
+  { name: "Estampados", icon: "🖨️" },
+  { name: "Otros", icon: "📦" },
+] as const;
 
 async function main() {
-  for (const category of DEFAULT_CATEGORIES) {
+  for (const category of DEFAULT_EXPENSE_CATEGORIES) {
     await prisma.category.upsert({
-      where: { name: category.name },
+      where: { name_type: { name: category.name, type: "EXPENSE" } },
       update: {},
-      create: category,
+      create: { ...category, type: "EXPENSE" },
     });
   }
-  console.log(`Categorías: ${DEFAULT_CATEGORIES.length} listas.`);
+  for (const category of DEFAULT_INCOME_CATEGORIES) {
+    await prisma.category.upsert({
+      where: { name_type: { name: category.name, type: "INCOME" } },
+      update: {},
+      create: { ...category, type: "INCOME" },
+    });
+  }
+  console.log(
+    `Categorías: ${DEFAULT_EXPENSE_CATEGORIES.length} de gasto, ${DEFAULT_INCOME_CATEGORIES.length} de ingreso.`,
+  );
 
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;

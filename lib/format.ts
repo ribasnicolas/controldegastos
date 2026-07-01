@@ -1,9 +1,9 @@
-export function formatCurrency(amount: number | string) {
+export function formatCurrency(amount: number | string, currency: "ARS" | "USD" = "ARS") {
   const value = typeof amount === "string" ? Number(amount) : amount;
   return new Intl.NumberFormat("es-AR", {
     style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
+    currency,
+    maximumFractionDigits: currency === "USD" ? 2 : 0,
   }).format(value);
 }
 

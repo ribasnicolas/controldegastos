@@ -10,6 +10,7 @@ const categorySchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio").max(50),
   icon: z.string().max(10).optional(),
   color: z.string().max(20).optional(),
+  type: z.enum(["EXPENSE", "INCOME"]),
 });
 
 export async function createCategory(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -18,6 +19,7 @@ export async function createCategory(_prev: ActionState, formData: FormData): Pr
     name: formData.get("name"),
     icon: formData.get("icon") || undefined,
     color: formData.get("color") || undefined,
+    type: formData.get("type"),
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
@@ -26,7 +28,7 @@ export async function createCategory(_prev: ActionState, formData: FormData): Pr
   try {
     await prisma.category.create({ data: parsed.data });
   } catch {
-    return { error: "Ya existe una categoría con ese nombre" };
+    return { error: "Ya existe una categoría con ese nombre y tipo" };
   }
 
   revalidatePath("/admin/categorias");

@@ -7,14 +7,20 @@ import { requireUser } from "@/lib/session";
 import type { ActionState } from "./types";
 
 const incomeSchema = z.object({
+  categoryId: z.string().min(1, "Elegí una categoría"),
   amount: z.coerce.number().positive("El monto debe ser mayor a 0"),
   description: z.string().max(200).optional(),
   date: z.string().optional(),
 });
 
+const updateIncomeSchema = incomeSchema.extend({
+  id: z.string().min(1),
+});
+
 export async function createIncome(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
   const parsed = incomeSchema.safeParse({
+    categoryId: formData.get("categoryId"),
     amount: formData.get("amount"),
     description: formData.get("description") || undefined,
     date: formData.get("date") || undefined,
@@ -26,11 +32,43 @@ export async function createIncome(_prev: ActionState, formData: FormData): Prom
   await prisma.income.create({
     data: {
       userId: user.id,
+      categoryId: parsed.data.categoryId,
       amount: parsed.data.amount,
       description: parsed.data.description,
       date: parsed.data.date ? new Date(parsed.data.date) : new Date(),
     },
   });
+
+  revalidatePath("/");
+  revalidatePath("/ingresos");
+  return { success: true };
+}
+
+export async function updateIncome(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = updateIncomeSchema.safeParse({
+    id: formData.get("id"),
+    categoryId: formData.get("categoryId"),
+    amount: formData.get("amount"),
+    description: formData.get("description") || undefined,
+    date: formData.get("date") || undefined,
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const result = await prisma.income.updateMany({
+    where: { id: parsed.data.id, userId: user.id },
+    data: {
+      categoryId: parsed.data.categoryId,
+      amount: parsed.data.amount,
+      description: parsed.data.description ?? null,
+      date: parsed.data.date ? new Date(parsed.data.date) : undefined,
+    },
+  });
+  if (result.count === 0) {
+    return { error: "No se pudo actualizar el ingreso" };
+  }
 
   revalidatePath("/");
   revalidatePath("/ingresos");

@@ -14,6 +14,7 @@ const recurringExpenseSchema = z.object({
 });
 
 const recurringIncomeSchema = z.object({
+  categoryId: z.string().min(1, "Elegí una categoría"),
   amount: z.coerce.number().positive("El monto debe ser mayor a 0"),
   description: z.string().max(200).optional(),
   dayOfMonth: z.coerce.number().int().min(1).max(28),
@@ -39,6 +40,7 @@ export async function createRecurringExpense(_prev: ActionState, formData: FormD
 export async function createRecurringIncome(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
   const parsed = recurringIncomeSchema.safeParse({
+    categoryId: formData.get("categoryId"),
     amount: formData.get("amount"),
     description: formData.get("description") || undefined,
     dayOfMonth: formData.get("dayOfMonth"),
@@ -137,6 +139,7 @@ export async function generateDueRecurring() {
       prisma.income.create({
         data: {
           userId: item.userId,
+          categoryId: item.categoryId,
           amount: item.amount,
           description: item.description ?? undefined,
           date: new Date(year, month - 1, item.dayOfMonth),

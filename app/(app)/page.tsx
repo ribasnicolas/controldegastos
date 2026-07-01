@@ -113,8 +113,8 @@ export default async function DashboardPage() {
             })),
             ...data.recentIncomes.map((i) => ({
               id: i.id,
-              label: i.description || "Ingreso",
-              icon: "💰",
+              label: i.description || i.category.name,
+              icon: i.category.icon ?? "💰",
               amount: Number(i.amount),
               date: i.date,
             })),

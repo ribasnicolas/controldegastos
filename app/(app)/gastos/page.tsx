@@ -2,10 +2,9 @@ import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getActiveCategories } from "@/lib/data/categories";
 import { currentMonthRange } from "@/lib/dates";
-import { formatCurrency, formatDate } from "@/lib/format";
-import { deleteExpense } from "@/lib/actions/expenses";
 import { ExpenseForm } from "./ExpenseForm";
 import { RecurringExpenses } from "./RecurringExpenses";
+import { ExpenseRow } from "./ExpenseRow";
 
 export default async function GastosPage() {
   const user = await requireUser();
@@ -30,32 +29,38 @@ export default async function GastosPage() {
       <h1 className="text-xl font-bold text-gray-900">Cargar gasto</h1>
       <ExpenseForm categories={categories} />
 
-      <RecurringExpenses categories={categories} items={recurring} />
+      <RecurringExpenses
+        categories={categories}
+        items={recurring.map((item) => ({
+          id: item.id,
+          amount: Number(item.amount),
+          description: item.description,
+          dayOfMonth: item.dayOfMonth,
+          active: item.active,
+          category: { name: item.category.name, icon: item.category.icon },
+        }))}
+      />
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">Gastos de este mes</h2>
         <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100">
           {expenses.map((expense) => (
-            <div key={expense.id} className="flex items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-2">
-                <span>{expense.category.icon}</span>
-                <div>
-                  <p className="text-sm text-gray-900">{expense.description || expense.category.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {expense.category.name} · {formatDate(expense.date)}
-                    {expense.sourceRecurringId ? " · fijo" : ""}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-gray-900">{formatCurrency(Number(expense.amount))}</span>
-                <form action={deleteExpense.bind(null, expense.id)}>
-                  <button type="submit" className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100">
-                    ✕
-                  </button>
-                </form>
-              </div>
-            </div>
+            <ExpenseRow
+              key={expense.id}
+              categories={categories}
+              expense={{
+                id: expense.id,
+                amount: Number(expense.amount),
+                description: expense.description,
+                date: expense.date,
+                sourceRecurringId: expense.sourceRecurringId,
+                category: {
+                  id: expense.category.id,
+                  name: expense.category.name,
+                  icon: expense.category.icon,
+                },
+              }}
+            />
           ))}
           {expenses.length === 0 && (
             <p className="px-4 py-6 text-sm text-gray-500 text-center">Todavía no cargaste gastos este mes.</p>

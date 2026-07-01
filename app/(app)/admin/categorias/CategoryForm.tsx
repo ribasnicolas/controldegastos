@@ -36,6 +36,14 @@ export function CategoryForm() {
           className="flex-1 h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
         />
       </div>
+      <select
+        name="type"
+        defaultValue="EXPENSE"
+        className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+      >
+        <option value="EXPENSE">Gasto</option>
+        <option value="INCOME">Ingreso</option>
+      </select>
       {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}
       <SubmitButton>Crear categoría</SubmitButton>
     </form>

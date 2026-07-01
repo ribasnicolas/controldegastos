@@ -13,6 +13,10 @@ const expenseSchema = z.object({
   date: z.string().optional(),
 });
 
+const updateExpenseSchema = expenseSchema.extend({
+  id: z.string().min(1),
+});
+
 export async function createExpense(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
   const parsed = expenseSchema.safeParse({
@@ -34,6 +38,37 @@ export async function createExpense(_prev: ActionState, formData: FormData): Pro
       date: parsed.data.date ? new Date(parsed.data.date) : new Date(),
     },
   });
+
+  revalidatePath("/");
+  revalidatePath("/gastos");
+  return { success: true };
+}
+
+export async function updateExpense(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = updateExpenseSchema.safeParse({
+    id: formData.get("id"),
+    categoryId: formData.get("categoryId"),
+    amount: formData.get("amount"),
+    description: formData.get("description") || undefined,
+    date: formData.get("date") || undefined,
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const result = await prisma.expense.updateMany({
+    where: { id: parsed.data.id, userId: user.id },
+    data: {
+      categoryId: parsed.data.categoryId,
+      amount: parsed.data.amount,
+      description: parsed.data.description ?? null,
+      date: parsed.data.date ? new Date(parsed.data.date) : undefined,
+    },
+  });
+  if (result.count === 0) {
+    return { error: "No se pudo actualizar el gasto" };
+  }
 
   revalidatePath("/");
   revalidatePath("/gastos");

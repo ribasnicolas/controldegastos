@@ -18,7 +18,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
       where: { userId, month, year },
       include: { category: true },
     }),
-    prisma.category.findMany({ where: { active: true }, orderBy: { name: "asc" } }),
+    prisma.category.findMany({ where: { active: true, type: "EXPENSE" }, orderBy: { name: "asc" } }),
     prisma.expense.findMany({
       where: { userId },
       orderBy: { date: "desc" },
@@ -29,6 +29,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
       where: { userId },
       orderBy: { date: "desc" },
       take: 5,
+      include: { category: true },
     }),
   ]);
 

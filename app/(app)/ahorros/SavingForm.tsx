@@ -2,20 +2,18 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { createIncome } from "@/lib/actions/incomes";
-import { CategoryPicker } from "@/components/ui/CategoryPicker";
+import { createSavingEntry } from "@/lib/actions/savings";
+import { SegmentedToggle } from "@/components/ui/SegmentedToggle";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { initialActionState } from "@/lib/actions/types";
 
-type Category = { id: string; name: string; icon: string | null };
-
-export function IncomeForm({ categories }: { categories: Category[] }) {
-  const [state, formAction] = useActionState(createIncome, initialActionState);
+export function SavingForm() {
+  const [state, formAction] = useActionState(createSavingEntry, initialActionState);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Ingreso guardado");
+      toast.success("Movimiento guardado");
       formRef.current?.reset();
     }
   }, [state]);
@@ -23,15 +21,33 @@ export function IncomeForm({ categories }: { categories: Category[] }) {
   return (
     <form ref={formRef} action={formAction} className="space-y-4 rounded-2xl bg-white border border-gray-200 p-4">
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-2">Categoría</p>
-        <CategoryPicker categories={categories} />
+        <p className="text-sm font-medium text-gray-700 mb-2">Tipo</p>
+        <SegmentedToggle
+          name="type"
+          defaultValue="DEPOSIT"
+          options={[
+            { value: "DEPOSIT", label: "Aporte" },
+            { value: "WITHDRAWAL", label: "Retiro" },
+          ]}
+        />
       </div>
       <div>
-        <label htmlFor="amount" className="text-sm font-medium text-gray-700">
+        <p className="text-sm font-medium text-gray-700 mb-2">Moneda</p>
+        <SegmentedToggle
+          name="currency"
+          defaultValue="ARS"
+          options={[
+            { value: "ARS", label: "Pesos (ARS)" },
+            { value: "USD", label: "Dólares (USD)" },
+          ]}
+        />
+      </div>
+      <div>
+        <label htmlFor="saving-amount" className="text-sm font-medium text-gray-700">
           Monto
         </label>
         <input
-          id="amount"
+          id="saving-amount"
           name="amount"
           type="number"
           inputMode="decimal"
@@ -43,20 +59,20 @@ export function IncomeForm({ categories }: { categories: Category[] }) {
         />
       </div>
       <div>
-        <label htmlFor="description" className="text-sm font-medium text-gray-700">
+        <label htmlFor="saving-description" className="text-sm font-medium text-gray-700">
           Descripción (opcional)
         </label>
         <input
-          id="description"
+          id="saving-description"
           name="description"
           type="text"
           maxLength={200}
-          placeholder="Ej: Sueldo"
+          placeholder="Ej: Plazo fijo"
           className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
         />
       </div>
       {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}
-      <SubmitButton>Guardar ingreso</SubmitButton>
+      <SubmitButton>Guardar movimiento</SubmitButton>
     </form>
   );
 }
