@@ -1,10 +1,24 @@
 import { prisma } from "@/lib/prisma";
-import { currentMonthRange } from "@/lib/dates";
+import { currentMonthRange, yearRange } from "@/lib/dates";
+
+const ESTAMPADOS_CATEGORY = "Estampados";
 
 export async function getDashboardData(userId: string, householdId: string | null) {
   const { start, end, month, year } = currentMonthRange();
+  const { start: yearStart, end: yearEnd } = yearRange(year);
 
-  const [expensesByCategory, incomeAgg, budgets, categories, recentExpenses, recentIncomes] = await Promise.all([
+  const [
+    expensesByCategory,
+    incomeAgg,
+    budgets,
+    categories,
+    recentExpenses,
+    recentIncomes,
+    estampadosMonthExpense,
+    estampadosMonthIncome,
+    estampadosYearExpense,
+    estampadosYearIncome,
+  ] = await Promise.all([
     prisma.expense.groupBy({
       by: ["categoryId"],
       where: { userId, date: { gte: start, lt: end } },
@@ -30,6 +44,22 @@ export async function getDashboardData(userId: string, householdId: string | nul
       orderBy: { date: "desc" },
       take: 5,
       include: { category: true },
+    }),
+    prisma.expense.aggregate({
+      where: { userId, date: { gte: start, lt: end }, category: { name: ESTAMPADOS_CATEGORY } },
+      _sum: { amount: true },
+    }),
+    prisma.income.aggregate({
+      where: { userId, date: { gte: start, lt: end }, category: { name: ESTAMPADOS_CATEGORY } },
+      _sum: { amount: true },
+    }),
+    prisma.expense.aggregate({
+      where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_CATEGORY } },
+      _sum: { amount: true },
+    }),
+    prisma.income.aggregate({
+      where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_CATEGORY } },
+      _sum: { amount: true },
     }),
   ]);
 
@@ -58,6 +88,19 @@ export async function getDashboardData(userId: string, householdId: string | nul
       spent,
     };
   });
+
+  const estampadosMonth = {
+    income: Number(estampadosMonthIncome._sum.amount ?? 0),
+    expense: Number(estampadosMonthExpense._sum.amount ?? 0),
+  };
+  const estampadosYear = {
+    income: Number(estampadosYearIncome._sum.amount ?? 0),
+    expense: Number(estampadosYearExpense._sum.amount ?? 0),
+  };
+  const estampados = {
+    month: { ...estampadosMonth, net: estampadosMonth.income - estampadosMonth.expense },
+    year: { ...estampadosYear, net: estampadosYear.income - estampadosYear.expense },
+  };
 
   let household: { name: string; totalIncome: number; totalExpense: number; available: number } | null = null;
   if (householdId) {
@@ -93,5 +136,6 @@ export async function getDashboardData(userId: string, householdId: string | nul
     recentExpenses,
     recentIncomes,
     household,
+    estampados,
   };
 }

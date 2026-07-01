@@ -4,6 +4,7 @@ import { useState } from "react";
 import { deleteExpense } from "@/lib/actions/expenses";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { EditExpenseSheet } from "./EditExpenseSheet";
+import { ConfirmDeleteForm } from "@/components/ui/ConfirmDeleteForm";
 
 type Category = { id: string; name: string; icon: string | null };
 type Expense = {
@@ -37,11 +38,12 @@ export function ExpenseRow({ expense, categories }: { expense: Expense; categori
         </button>
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-sm font-semibold text-gray-900">{formatCurrency(expense.amount)}</span>
-          <form action={deleteExpense.bind(null, expense.id)}>
-            <button type="submit" className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100">
-              ✕
-            </button>
-          </form>
+          <ConfirmDeleteForm
+            action={deleteExpense.bind(null, expense.id)}
+            confirmMessage="¿Eliminar este gasto?"
+          >
+            ✕
+          </ConfirmDeleteForm>
         </div>
       </div>
       {editing && (

@@ -65,6 +65,28 @@ export default async function DashboardPage() {
         </div>
       </section>
 
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-gray-700">Estampados</h2>
+        <div className="rounded-2xl bg-white border border-gray-200 p-4 grid grid-cols-2 gap-4">
+          {(
+            [
+              { label: "Este mes", data: data.estampados.month },
+              { label: `Año ${data.year}`, data: data.estampados.year },
+            ] as const
+          ).map(({ label, data: row }) => (
+            <div key={label}>
+              <p className="text-xs text-gray-500">{label}</p>
+              <p className={`text-lg font-bold ${row.net >= 0 ? "text-brand-primary-dark" : "text-brand-danger"}`}>
+                {formatCurrency(row.net)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Ingresos {formatCurrency(row.income)} · Egresos {formatCurrency(row.expense)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {data.budgetsBreakdown.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center justify-between">

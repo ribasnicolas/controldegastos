@@ -9,6 +9,7 @@ import {
 } from "@/lib/actions/recurring";
 import { CategoryPicker } from "@/components/ui/CategoryPicker";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { ConfirmDeleteForm } from "@/components/ui/ConfirmDeleteForm";
 import { formatCurrency } from "@/lib/format";
 import { initialActionState } from "@/lib/actions/types";
 
@@ -39,7 +40,7 @@ export function RecurringExpenses({ categories, items }: { categories: Category[
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-gray-700">Gastos fijos (recurrentes)</h2>
         <button type="button" onClick={() => setOpen((v) => !v)} className="text-sm text-brand-primary font-medium">
-          {open ? "Cerrar" : "+ Agregar"}
+          {open ? "Cerrar" : "+ Gasto fijo"}
         </button>
       </div>
 
@@ -66,11 +67,12 @@ export function RecurringExpenses({ categories, items }: { categories: Category[
                     {item.active ? "Activo" : "Pausado"}
                   </button>
                 </form>
-                <form action={deleteRecurringExpense.bind(null, item.id)}>
-                  <button type="submit" className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100">
-                    ✕
-                  </button>
-                </form>
+                <ConfirmDeleteForm
+                  action={deleteRecurringExpense.bind(null, item.id)}
+                  confirmMessage="¿Eliminar este gasto fijo?"
+                >
+                  ✕
+                </ConfirmDeleteForm>
               </div>
             </div>
           ))}

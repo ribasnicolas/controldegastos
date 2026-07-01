@@ -4,6 +4,7 @@ import { useState } from "react";
 import { deleteIncome } from "@/lib/actions/incomes";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { EditIncomeSheet } from "./EditIncomeSheet";
+import { ConfirmDeleteForm } from "@/components/ui/ConfirmDeleteForm";
 
 type Category = { id: string; name: string; icon: string | null };
 type Income = {
@@ -37,11 +38,12 @@ export function IncomeRow({ income, categories }: { income: Income; categories: 
         </button>
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-sm font-semibold text-brand-primary-dark">{formatCurrency(income.amount)}</span>
-          <form action={deleteIncome.bind(null, income.id)}>
-            <button type="submit" className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100">
-              ✕
-            </button>
-          </form>
+          <ConfirmDeleteForm
+            action={deleteIncome.bind(null, income.id)}
+            confirmMessage="¿Eliminar este ingreso?"
+          >
+            ✕
+          </ConfirmDeleteForm>
         </div>
       </div>
       {editing && (

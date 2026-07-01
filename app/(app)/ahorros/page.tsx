@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { deleteSavingEntry } from "@/lib/actions/savings";
 import { SavingForm } from "./SavingForm";
+import { ConfirmDeleteForm } from "@/components/ui/ConfirmDeleteForm";
 
 export default async function AhorrosPage() {
   const user = await requireUser();
@@ -57,11 +58,12 @@ export default async function AhorrosPage() {
                     {isDeposit ? "+" : "-"}
                     {formatCurrency(Number(entry.amount), entry.currency)}
                   </span>
-                  <form action={deleteSavingEntry.bind(null, entry.id)}>
-                    <button type="submit" className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100">
-                      ✕
-                    </button>
-                  </form>
+                  <ConfirmDeleteForm
+                    action={deleteSavingEntry.bind(null, entry.id)}
+                    confirmMessage="¿Eliminar este movimiento de ahorro?"
+                  >
+                    ✕
+                  </ConfirmDeleteForm>
                 </div>
               </div>
             );

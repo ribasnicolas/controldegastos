@@ -1,14 +1,23 @@
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getActiveIncomeCategories } from "@/lib/data/categories";
-import { currentMonthRange } from "@/lib/dates";
+import { currentMonthRange, monthLabel, monthRange } from "@/lib/dates";
 import { IncomeForm } from "./IncomeForm";
 import { RecurringIncomes } from "./RecurringIncomes";
 import { IncomeRow } from "./IncomeRow";
+import { MonthNav } from "@/components/ui/MonthNav";
 
-export default async function IngresosPage() {
+export default async function IngresosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ y?: string; m?: string }>;
+}) {
   const user = await requireUser();
-  const { start, end } = currentMonthRange();
+  const { y, m } = await searchParams;
+  const current = currentMonthRange();
+  const year = y ? Number(y) : current.year;
+  const month = m ? Number(m) : current.month;
+  const { start, end } = monthRange(year, month);
 
   const [categories, incomes, recurring] = await Promise.all([
     getActiveIncomeCategories(),
@@ -26,7 +35,9 @@ export default async function IngresosPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">Cargar ingreso</h1>
+      <h1 className="text-xl font-bold text-gray-900">Ingresos</h1>
+      <MonthNav basePath="/ingresos" year={year} month={month} />
+
       <IncomeForm categories={categories} />
 
       <RecurringIncomes
@@ -42,7 +53,7 @@ export default async function IngresosPage() {
       />
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-700">Ingresos de este mes</h2>
+        <h2 className="text-sm font-semibold text-gray-700">Ingresos de {monthLabel(month, year).toLowerCase()}</h2>
         <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100">
           {incomes.map((income) => (
             <IncomeRow

@@ -1,14 +1,23 @@
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getActiveCategories } from "@/lib/data/categories";
-import { currentMonthRange } from "@/lib/dates";
+import { currentMonthRange, monthLabel, monthRange } from "@/lib/dates";
 import { ExpenseForm } from "./ExpenseForm";
 import { RecurringExpenses } from "./RecurringExpenses";
 import { ExpenseRow } from "./ExpenseRow";
+import { MonthNav } from "@/components/ui/MonthNav";
 
-export default async function GastosPage() {
+export default async function GastosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ y?: string; m?: string }>;
+}) {
   const user = await requireUser();
-  const { start, end } = currentMonthRange();
+  const { y, m } = await searchParams;
+  const current = currentMonthRange();
+  const year = y ? Number(y) : current.year;
+  const month = m ? Number(m) : current.month;
+  const { start, end } = monthRange(year, month);
 
   const [categories, expenses, recurring] = await Promise.all([
     getActiveCategories(),
@@ -26,7 +35,9 @@ export default async function GastosPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">Cargar gasto</h1>
+      <h1 className="text-xl font-bold text-gray-900">Gastos</h1>
+      <MonthNav basePath="/gastos" year={year} month={month} />
+
       <ExpenseForm categories={categories} />
 
       <RecurringExpenses
@@ -42,7 +53,7 @@ export default async function GastosPage() {
       />
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-700">Gastos de este mes</h2>
+        <h2 className="text-sm font-semibold text-gray-700">Gastos de {monthLabel(month, year).toLowerCase()}</h2>
         <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100">
           {expenses.map((expense) => (
             <ExpenseRow

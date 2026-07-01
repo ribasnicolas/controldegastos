@@ -13,6 +13,7 @@ const DEFAULT_EXPENSE_CATEGORIES = [
   { name: "Educación", icon: "📚" },
   { name: "Ropa", icon: "👕" },
   { name: "Actividades", icon: "⚽" },
+  { name: "Estampados", icon: "🖨️" },
   { name: "Otros", icon: "📦" },
 ] as const;
 
