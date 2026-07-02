@@ -58,11 +58,14 @@ export default async function DashboardPage() {
       {(data.creditCardExpense > 0 || data.debtsPending > 0) && (
         <div className={data.creditCardExpense > 0 && data.debtsPending > 0 ? "grid grid-cols-2 gap-3" : ""}>
           {data.creditCardExpense > 0 && (
-            <div className="card-surface p-4">
+            <Link
+              href={`/gastos?y=${data.year}&m=${data.month}&paymentMethod=CREDIT_CARD`}
+              className="card-surface p-4 block tap"
+            >
               <p className="text-xs text-gray-500">💳 Tarjeta este mes</p>
               <p className="text-lg font-semibold text-gray-900">{formatCurrency(data.creditCardExpense)}</p>
               <p className="text-xs text-gray-400 mt-1">Se paga el mes que viene</p>
-            </div>
+            </Link>
           )}
           {data.debtsPending > 0 && (
             <Link href="/deudas" className="card-surface p-4 block tap">

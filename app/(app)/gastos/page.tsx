@@ -9,13 +9,19 @@ import { ExpenseRow } from "./ExpenseRow";
 import { MonthNav } from "@/components/ui/MonthNav";
 import { CollapsibleCard } from "@/components/ui/CollapsibleCard";
 
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  CASH: "💵 Efectivo",
+  TRANSFER: "🏦 Transferencia",
+  CREDIT_CARD: "💳 Tarjeta",
+};
+
 export default async function GastosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ y?: string; m?: string; categoryId?: string }>;
+  searchParams: Promise<{ y?: string; m?: string; categoryId?: string; paymentMethod?: string }>;
 }) {
   const user = await requireUser();
-  const { y, m, categoryId } = await searchParams;
+  const { y, m, categoryId, paymentMethod } = await searchParams;
   const current = currentMonthRange();
   const year = y ? Number(y) : current.year;
   const month = m ? Number(m) : current.month;
@@ -28,6 +34,7 @@ export default async function GastosPage({
         userId: user.id,
         date: { gte: start, lt: end },
         ...(categoryId ? { categoryId } : {}),
+        ...(paymentMethod ? { paymentMethod: paymentMethod as "CASH" | "TRANSFER" | "CREDIT_CARD" } : {}),
       },
       orderBy: { createdAt: "desc" },
       include: { category: true },
@@ -40,6 +47,7 @@ export default async function GastosPage({
   ]);
 
   const filteredCategory = categoryId ? categories.find((c) => c.id === categoryId) : undefined;
+  const paymentMethodLabel = paymentMethod ? PAYMENT_METHOD_LABELS[paymentMethod] : undefined;
 
   return (
     <div className="space-y-6">
@@ -65,14 +73,30 @@ export default async function GastosPage({
       />
 
       <div className="space-y-3">
-        {filteredCategory && (
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-brand-primary/10 text-brand-primary-dark text-sm font-medium">
-              {filteredCategory.icon} {filteredCategory.name}
-            </span>
-            <Link href={`/gastos?y=${year}&m=${month}`} className="text-sm text-gray-500 tap">
-              ✕ Quitar filtro
-            </Link>
+        {(filteredCategory || paymentMethodLabel) && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {filteredCategory && (
+              <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-brand-primary/10 text-brand-primary-dark text-sm font-medium">
+                {filteredCategory.icon} {filteredCategory.name}
+                <Link
+                  href={`/gastos?y=${year}&m=${month}${paymentMethod ? `&paymentMethod=${paymentMethod}` : ""}`}
+                  className="tap"
+                >
+                  ✕
+                </Link>
+              </span>
+            )}
+            {paymentMethodLabel && (
+              <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-brand-primary/10 text-brand-primary-dark text-sm font-medium">
+                {paymentMethodLabel}
+                <Link
+                  href={`/gastos?y=${year}&m=${month}${categoryId ? `&categoryId=${categoryId}` : ""}`}
+                  className="tap"
+                >
+                  ✕
+                </Link>
+              </span>
+            )}
           </div>
         )}
 
