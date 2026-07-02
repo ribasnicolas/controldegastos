@@ -38,13 +38,13 @@ export async function getDashboardData(userId: string, householdId: string | nul
     prisma.category.findMany({ where: { active: true, type: "EXPENSE" }, orderBy: { name: "asc" } }),
     prisma.expense.findMany({
       where: { userId },
-      orderBy: { date: "desc" },
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       take: 5,
       include: { category: true },
     }),
     prisma.income.findMany({
       where: { userId },
-      orderBy: { date: "desc" },
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       take: 5,
       include: { category: true },
     }),

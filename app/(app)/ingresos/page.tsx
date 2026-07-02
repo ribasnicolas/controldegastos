@@ -24,7 +24,7 @@ export default async function IngresosPage({
     getActiveIncomeCategories(),
     prisma.income.findMany({
       where: { userId: user.id, date: { gte: start, lt: end } },
-      orderBy: { date: "desc" },
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       include: { category: true },
     }),
     prisma.recurringIncome.findMany({

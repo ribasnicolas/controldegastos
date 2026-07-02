@@ -29,7 +29,7 @@ export default async function GastosPage({
         date: { gte: start, lt: end },
         ...(categoryId ? { categoryId } : {}),
       },
-      orderBy: { date: "desc" },
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       include: { category: true },
     }),
     prisma.recurringExpense.findMany({
