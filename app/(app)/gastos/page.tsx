@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getActiveCategories } from "@/lib/data/categories";
@@ -8,12 +7,13 @@ import { RecurringExpenses } from "./RecurringExpenses";
 import { ExpenseRow } from "./ExpenseRow";
 import { MonthNav } from "@/components/ui/MonthNav";
 import { CollapsibleCard } from "@/components/ui/CollapsibleCard";
+import { ListFilters } from "@/components/ui/ListFilters";
 
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  CASH: "💵 Efectivo",
-  TRANSFER: "🏦 Transferencia",
-  CREDIT_CARD: "💳 Tarjeta",
-};
+const PAYMENT_METHOD_OPTIONS = [
+  { value: "TRANSFER", label: "🏦 Transferencia" },
+  { value: "CASH", label: "💵 Efectivo" },
+  { value: "CREDIT_CARD", label: "💳 Tarjeta" },
+];
 
 export default async function GastosPage({
   searchParams,
@@ -46,9 +46,6 @@ export default async function GastosPage({
     }),
   ]);
 
-  const filteredCategory = categoryId ? categories.find((c) => c.id === categoryId) : undefined;
-  const paymentMethodLabel = paymentMethod ? PAYMENT_METHOD_LABELS[paymentMethod] : undefined;
-
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-bold text-gray-900">Gastos</h1>
@@ -73,32 +70,24 @@ export default async function GastosPage({
       />
 
       <div className="space-y-3">
-        {(filteredCategory || paymentMethodLabel) && (
-          <div className="flex items-center gap-2 flex-wrap">
-            {filteredCategory && (
-              <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-brand-primary/10 text-brand-primary-dark text-sm font-medium">
-                {filteredCategory.icon} {filteredCategory.name}
-                <Link
-                  href={`/gastos?y=${year}&m=${month}${paymentMethod ? `&paymentMethod=${paymentMethod}` : ""}`}
-                  className="tap"
-                >
-                  ✕
-                </Link>
-              </span>
-            )}
-            {paymentMethodLabel && (
-              <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-brand-primary/10 text-brand-primary-dark text-sm font-medium">
-                {paymentMethodLabel}
-                <Link
-                  href={`/gastos?y=${year}&m=${month}${categoryId ? `&categoryId=${categoryId}` : ""}`}
-                  className="tap"
-                >
-                  ✕
-                </Link>
-              </span>
-            )}
-          </div>
-        )}
+        <ListFilters
+          basePath="/gastos"
+          fixedParams={{ y: String(year), m: String(month) }}
+          filters={[
+            {
+              name: "categoryId",
+              value: categoryId ?? "",
+              placeholder: "Todas las categorías",
+              options: categories.map((c) => ({ value: c.id, label: `${c.icon ?? ""} ${c.name}`.trim() })),
+            },
+            {
+              name: "paymentMethod",
+              value: paymentMethod ?? "",
+              placeholder: "Toda forma de pago",
+              options: PAYMENT_METHOD_OPTIONS,
+            },
+          ]}
+        />
 
         <CollapsibleCard
           title={`Gastos de ${monthLabel(month, year).toLowerCase()}`}

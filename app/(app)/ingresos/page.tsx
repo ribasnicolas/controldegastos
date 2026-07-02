@@ -7,14 +7,15 @@ import { RecurringIncomes } from "./RecurringIncomes";
 import { IncomeRow } from "./IncomeRow";
 import { MonthNav } from "@/components/ui/MonthNav";
 import { CollapsibleCard } from "@/components/ui/CollapsibleCard";
+import { ListFilters } from "@/components/ui/ListFilters";
 
 export default async function IngresosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ y?: string; m?: string }>;
+  searchParams: Promise<{ y?: string; m?: string; categoryId?: string }>;
 }) {
   const user = await requireUser();
-  const { y, m } = await searchParams;
+  const { y, m, categoryId } = await searchParams;
   const current = currentMonthRange();
   const year = y ? Number(y) : current.year;
   const month = m ? Number(m) : current.month;
@@ -23,7 +24,11 @@ export default async function IngresosPage({
   const [categories, incomes, recurring] = await Promise.all([
     getActiveIncomeCategories(),
     prisma.income.findMany({
-      where: { userId: user.id, date: { gte: start, lt: end } },
+      where: {
+        userId: user.id,
+        date: { gte: start, lt: end },
+        ...(categoryId ? { categoryId } : {}),
+      },
       orderBy: { createdAt: "desc" },
       include: { category: true },
     }),
@@ -51,6 +56,19 @@ export default async function IngresosPage({
           active: item.active,
           category: { id: item.category.id, name: item.category.name, icon: item.category.icon },
         }))}
+      />
+
+      <ListFilters
+        basePath="/ingresos"
+        fixedParams={{ y: String(year), m: String(month) }}
+        filters={[
+          {
+            name: "categoryId",
+            value: categoryId ?? "",
+            placeholder: "Todas las categorías",
+            options: categories.map((c) => ({ value: c.id, label: `${c.icon ?? ""} ${c.name}`.trim() })),
+          },
+        ]}
       />
 
       <CollapsibleCard
