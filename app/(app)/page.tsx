@@ -188,6 +188,7 @@ export default async function DashboardPage() {
               icon: e.icon || e.category.icon || "💸",
               amount: -Number(e.amount),
               date: e.date,
+              createdAt: e.createdAt,
             })),
             ...data.recentIncomes.map((i) => ({
               id: i.id,
@@ -195,9 +196,10 @@ export default async function DashboardPage() {
               icon: i.icon || i.category.icon || "💰",
               amount: Number(i.amount),
               date: i.date,
+              createdAt: i.createdAt,
             })),
           ]
-            .sort((a, b) => b.date.getTime() - a.date.getTime())
+            .sort((a, b) => b.date.getTime() - a.date.getTime() || b.createdAt.getTime() - a.createdAt.getTime())
             .slice(0, 6)
             .map((movement) => (
               <div key={movement.id} className="flex items-center justify-between px-4 py-3">

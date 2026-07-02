@@ -50,6 +50,8 @@ export default async function GastosPage({
 
       <RecurringExpenses
         categories={categories}
+        year={year}
+        month={month}
         items={recurring.map((item) => ({
           id: item.id,
           amount: Number(item.amount),

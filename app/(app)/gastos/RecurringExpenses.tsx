@@ -30,15 +30,17 @@ type Recurring = {
 
 function RecurringExpenseItem({
   item,
-  day,
-  month,
-  year,
+  today,
+  browsedMonth,
+  browsedYear,
+  isCurrentMonth,
   onEdit,
 }: {
   item: Recurring;
-  day: number;
-  month: number;
-  year: number;
+  today: number;
+  browsedMonth: number;
+  browsedYear: number;
+  isCurrentMonth: boolean;
   onEdit: () => void;
 }) {
   const [state, confirmAction] = useActionState(
@@ -60,9 +62,14 @@ function RecurringExpenseItem({
     if (undoState.error) toast.error(undoState.error);
   }, [undoState]);
 
-  const isDue = item.active && item.dayOfMonth <= day;
-  const isConfirmed = item.lastGeneratedMonth === month && item.lastGeneratedYear === year;
+  // Fuera del mes actual (planificando o mirando para atrás) se considera
+  // todo "vencido": no tiene sentido esperar a un día que ya no es hoy.
+  const isDue = item.active && (!isCurrentMonth || item.dayOfMonth <= today);
+  const isConfirmed = item.lastGeneratedMonth === browsedMonth && item.lastGeneratedYear === browsedYear;
   const pending = isDue && !isConfirmed;
+  // Solo se puede confirmar el pago real del mes actual, no de un mes que
+  // todavía no llegó (o que ya pasó).
+  const canConfirm = isCurrentMonth && pending;
 
   return (
     <div className="flex items-center justify-between px-4 py-3 gap-2">
@@ -73,14 +80,14 @@ function RecurringExpenseItem({
         <p className="text-xs text-gray-500 truncate">
           Día {item.dayOfMonth} · {formatCurrency(Number(item.amount))}
           {item.active && isConfirmed && (
-            <span className="text-brand-primary-dark font-medium"> · ✓ Pagado este mes</span>
+            <span className="text-brand-primary-dark font-medium"> · ✓ Pagado</span>
           )}
           {pending && <span className="text-brand-secondary-dark font-medium"> · Pendiente de pago</span>}
           {item.active && !isDue && !isConfirmed && <span className="text-gray-400"> · No pagado</span>}
         </p>
       </button>
       <div className="flex items-center gap-2 shrink-0">
-        {pending && (
+        {canConfirm && (
           <form action={confirmAction}>
             <button
               type="submit"
@@ -117,7 +124,17 @@ function RecurringExpenseItem({
   );
 }
 
-export function RecurringExpenses({ categories, items }: { categories: Category[]; items: Recurring[] }) {
+export function RecurringExpenses({
+  categories,
+  items,
+  year,
+  month,
+}: {
+  categories: Category[];
+  items: Recurring[];
+  year: number;
+  month: number;
+}) {
   const [state, formAction] = useActionState(createRecurringExpense, initialActionState);
   const [open, setOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
@@ -132,9 +149,8 @@ export function RecurringExpenses({ categories, items }: { categories: Category[
   }, [state]);
 
   const now = new Date();
-  const day = now.getDate();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
+  const today = now.getDate();
+  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
 
   return (
     <section className="card-surface">
@@ -157,9 +173,10 @@ export function RecurringExpenses({ categories, items }: { categories: Category[
                 <RecurringExpenseItem
                   key={item.id}
                   item={item}
-                  day={day}
-                  month={month}
-                  year={year}
+                  today={today}
+                  browsedMonth={month}
+                  browsedYear={year}
+                  isCurrentMonth={isCurrentMonth}
                   onEdit={() => setEditing(item)}
                 />
               ))}

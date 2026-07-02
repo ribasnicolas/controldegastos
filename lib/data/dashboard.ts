@@ -4,7 +4,8 @@ import { currentMonthRange, yearRange } from "@/lib/dates";
 const ESTAMPADOS_CATEGORY = "Estampados";
 
 export async function getDashboardData(userId: string, householdId: string | null) {
-  const { start, end, month, year } = currentMonthRange();
+  const now = new Date();
+  const { start, end, month, year } = currentMonthRange(now);
   const { start: yearStart, end: yearEnd } = yearRange(year);
 
   const [
@@ -37,13 +38,13 @@ export async function getDashboardData(userId: string, householdId: string | nul
     }),
     prisma.category.findMany({ where: { active: true, type: "EXPENSE" }, orderBy: { name: "asc" } }),
     prisma.expense.findMany({
-      where: { userId },
+      where: { userId, date: { lte: now } },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       take: 5,
       include: { category: true },
     }),
     prisma.income.findMany({
-      where: { userId },
+      where: { userId, date: { lte: now } },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       take: 5,
       include: { category: true },
