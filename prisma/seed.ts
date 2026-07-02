@@ -20,6 +20,7 @@ const DEFAULT_EXPENSE_CATEGORIES = [
 const DEFAULT_INCOME_CATEGORIES = [
   { name: "Sueldo", icon: "💼" },
   { name: "Estampados", icon: "🖨️" },
+  { name: "Deudas cobradas", icon: "🤝" },
   { name: "Otros", icon: "📦" },
 ] as const;
 

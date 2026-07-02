@@ -22,6 +22,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     creditCardAgg,
     activeRecurringExpenses,
     debtsAgg,
+    currentUser,
   ] = await Promise.all([
     prisma.expense.groupBy({
       by: ["categoryId"],
@@ -39,13 +40,13 @@ export async function getDashboardData(userId: string, householdId: string | nul
     prisma.category.findMany({ where: { active: true, type: "EXPENSE" }, orderBy: { name: "asc" } }),
     prisma.expense.findMany({
       where: { userId, date: { lte: now } },
-      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+      orderBy: { createdAt: "desc" },
       take: 5,
       include: { category: true },
     }),
     prisma.income.findMany({
       where: { userId, date: { lte: now } },
-      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+      orderBy: { createdAt: "desc" },
       take: 5,
       include: { category: true },
     }),
@@ -71,6 +72,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     }),
     prisma.recurringExpense.findMany({ where: { userId, active: true } }),
     prisma.debt.aggregate({ where: { userId, settled: false }, _sum: { amount: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { actualBalance: true } }),
   ]);
 
   const categoryById = new Map(categories.map((c) => [c.id, c]));
@@ -96,6 +98,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     .reduce((sum, item) => sum + Number(item.amount), 0);
   const projectedAvailable = available - pendingFixedTotal;
   const debtsPending = Number(debtsAgg._sum.amount ?? 0);
+  const actualBalance = currentUser?.actualBalance != null ? Number(currentUser.actualBalance) : null;
 
   const budgetsBreakdown = budgets.map((budget) => {
     const spent = expensesBreakdown.find((row) => row.categoryId === budget.categoryId)?.amount ?? 0;
@@ -159,6 +162,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     pendingFixedTotal,
     projectedAvailable,
     debtsPending,
+    actualBalance,
     expensesBreakdown,
     budgetsBreakdown,
     recentExpenses,

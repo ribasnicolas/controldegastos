@@ -4,6 +4,7 @@ import { getDashboardData } from "@/lib/data/dashboard";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { monthLabel } from "@/lib/dates";
 import { ExpensePieChart } from "@/components/ExpensePieChart";
+import { ActualBalanceWidget } from "@/components/ActualBalanceWidget";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -15,46 +16,32 @@ export default async function DashboardPage() {
         <p className="text-sm text-gray-500">{monthLabel(data.month, data.year)}</p>
         <div
           className={`mt-2 rounded-3xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] ${
-            data.available >= 0 ? "bg-brand-primary/10" : "bg-brand-danger/10"
+            data.projectedAvailable >= 0 ? "bg-brand-primary/10" : "bg-brand-danger/10"
           }`}
         >
-          <p className="text-sm text-gray-600">Disponible</p>
+          <p className="text-sm text-gray-600">Saldo si pagás los gastos fijos</p>
           <p
             className={`text-4xl font-bold tracking-tight ${
-              data.available >= 0 ? "text-brand-primary-dark" : "text-brand-danger"
+              data.projectedAvailable >= 0 ? "text-brand-primary-dark" : "text-brand-danger"
             }`}
           >
-            {formatCurrency(data.available)}
+            {formatCurrency(data.projectedAvailable)}
           </p>
-        </div>
 
-        {data.pendingFixedTotal > 0 && (
-          <div className="mt-2 card-surface p-4 space-y-2">
-            <p className="text-xs text-gray-500">
-              Faltan descontar los gastos fijos que aún no fueron pagados
-            </p>
+          <div className="mt-4 pt-4 border-t border-black/10 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Total pendiente</span>
-              <span className="font-semibold text-brand-secondary-dark">
-                {formatCurrency(data.pendingFixedTotal)}
-              </span>
+              <span className="text-gray-600">Gastos fijos pendientes</span>
+              <span className="font-semibold text-gray-900">{formatCurrency(data.pendingFixedTotal)}</span>
             </div>
-            <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
+            <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600">Saldo real</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(data.available)}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Saldo si pagás los gastos fijos</span>
-              <span
-                className={`font-semibold ${
-                  data.projectedAvailable >= 0 ? "text-brand-primary-dark" : "text-brand-danger"
-                }`}
-              >
-                {formatCurrency(data.projectedAvailable)}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-gray-900">{formatCurrency(data.available)}</span>
+                <ActualBalanceWidget actualBalance={data.actualBalance} />
+              </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -199,7 +186,7 @@ export default async function DashboardPage() {
               createdAt: i.createdAt,
             })),
           ]
-            .sort((a, b) => b.date.getTime() - a.date.getTime() || b.createdAt.getTime() - a.createdAt.getTime())
+            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .slice(0, 6)
             .map((movement) => (
               <div key={movement.id} className="flex items-center justify-between px-4 py-3">
