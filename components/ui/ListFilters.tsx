@@ -32,7 +32,7 @@ export function ListFilters({
           key={filter.name}
           value={filter.value}
           onChange={(e) => handleChange(filter.name, e.target.value)}
-          className="h-9 flex-1 min-w-0 rounded-lg border border-gray-300 bg-white px-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-primary"
+          className="h-9 flex-1 min-w-0 rounded-lg border border-gray-300 bg-white px-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300"
         >
           <option value="">{filter.placeholder}</option>
           {filter.options.map((option) => (

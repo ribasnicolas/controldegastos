@@ -41,15 +41,15 @@ export function EditExpenseSheet({
   return (
     <div className="fixed inset-0 z-30 flex items-end bg-black/40" onClick={onClose}>
       <div
-        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 max-h-[85vh] overflow-y-auto"
+        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 max-h-[85vh] overflow-y-auto dark:bg-gray-900"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <p className="text-base font-semibold text-gray-900">Editar gasto</p>
+          <p className="text-base font-semibold text-gray-900 dark:text-gray-100">Editar gasto</p>
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap"
+            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap dark:hover:bg-gray-800"
           >
             ✕
           </button>
@@ -57,15 +57,15 @@ export function EditExpenseSheet({
         <form action={formAction} className="space-y-4">
           <input type="hidden" name="id" value={expense.id} />
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Categoría</p>
+            <p className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Categoría</p>
             <CategoryPicker categories={categories} defaultValue={expense.category.id} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Ícono (opcional)</p>
+            <p className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Ícono (opcional)</p>
             <IconPicker defaultValue={expense.icon} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Forma de pago</p>
+            <p className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Forma de pago</p>
             <SegmentedToggle
               name="paymentMethod"
               defaultValue={expense.paymentMethod}
@@ -77,7 +77,7 @@ export function EditExpenseSheet({
             />
           </div>
           <div>
-            <label htmlFor={`edit-amount-${expense.id}`} className="text-sm font-medium text-gray-700">
+            <label htmlFor={`edit-amount-${expense.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Monto
             </label>
             <input
@@ -89,11 +89,11 @@ export function EditExpenseSheet({
               min="0"
               required
               defaultValue={expense.amount}
-              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label htmlFor={`edit-description-${expense.id}`} className="text-sm font-medium text-gray-700">
+            <label htmlFor={`edit-description-${expense.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Descripción (opcional)
             </label>
             <input
@@ -102,11 +102,11 @@ export function EditExpenseSheet({
               type="text"
               maxLength={200}
               defaultValue={expense.description ?? ""}
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label htmlFor={`edit-date-${expense.id}`} className="text-sm font-medium text-gray-700">
+            <label htmlFor={`edit-date-${expense.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Fecha
             </label>
             <input
@@ -114,7 +114,7 @@ export function EditExpenseSheet({
               name="date"
               type="date"
               defaultValue={new Date(expense.date).toISOString().slice(0, 10)}
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}

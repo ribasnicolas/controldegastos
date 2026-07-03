@@ -57,7 +57,7 @@ export function LiabilityRow({ liability }: { liability: Liability }) {
     statusClass = "text-brand-primary-dark font-medium";
   } else if (!hasStarted) {
     status = `Empieza ${liability.startMonth}/${liability.startYear}`;
-    statusClass = "text-gray-400";
+    statusClass = "text-gray-400 dark:text-gray-500";
   } else if (isPaidThisMonth) {
     status = "✓ Cuota de este mes pagada";
     statusClass = "text-brand-primary-dark font-medium";
@@ -69,11 +69,11 @@ export function LiabilityRow({ liability }: { liability: Liability }) {
   return (
     <div className="flex items-center justify-between px-4 py-3 gap-2">
       <div className="min-w-0">
-        <p className="text-sm text-gray-900 truncate">
+        <p className="text-sm text-gray-900 dark:text-gray-100 truncate">
           {liability.personName}
           {liability.description ? ` · ${liability.description}` : ""}
         </p>
-        <p className="text-xs text-gray-500 truncate">
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
           {liability.installments > 1
             ? `Cuota ${Math.min(liability.installmentsPaid + 1, liability.installments)}/${liability.installments} · ${formatCurrency(installmentAmount)}`
             : formatCurrency(installmentAmount)}
@@ -96,7 +96,7 @@ export function LiabilityRow({ liability }: { liability: Liability }) {
           <ConfirmDeleteForm
             action={undoAction}
             confirmMessage="¿Deshacer el pago de esta cuota? Se borra el gasto generado."
-            className="h-8 px-3 rounded-full text-xs font-medium bg-gray-100 text-gray-500 tap"
+            className="h-8 px-3 rounded-full text-xs font-medium bg-gray-100 text-gray-500 tap dark:bg-gray-800 dark:text-gray-400"
           >
             Deshacer
           </ConfirmDeleteForm>

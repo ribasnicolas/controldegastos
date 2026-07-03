@@ -25,7 +25,7 @@ export function DebtForm() {
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 text-left tap"
       >
-        <span className="text-sm font-semibold text-gray-700">Cargar deuda</span>
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Cargar deuda</span>
         <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "+ Cargar deuda"}</span>
       </button>
 
@@ -33,10 +33,10 @@ export function DebtForm() {
         <form
           ref={formRef}
           action={formAction}
-          className="space-y-4 p-4 pt-0 border-t border-gray-100"
+          className="space-y-4 p-4 pt-0 border-t border-gray-100 dark:border-gray-800"
         >
           <div>
-            <label htmlFor="debt-personName" className="text-sm font-medium text-gray-700">
+            <label htmlFor="debt-personName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Quién te debe
             </label>
             <input
@@ -46,11 +46,11 @@ export function DebtForm() {
               required
               maxLength={100}
               placeholder="Ej: Juan"
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label htmlFor="debt-amount" className="text-sm font-medium text-gray-700">
+            <label htmlFor="debt-amount" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Monto
             </label>
             <input
@@ -62,11 +62,11 @@ export function DebtForm() {
               min="0"
               required
               placeholder="0"
-              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label htmlFor="debt-description" className="text-sm font-medium text-gray-700">
+            <label htmlFor="debt-description" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Descripción (opcional)
             </label>
             <input
@@ -75,7 +75,7 @@ export function DebtForm() {
               type="text"
               maxLength={200}
               placeholder="Ej: Préstamo para el viaje"
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}

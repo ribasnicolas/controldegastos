@@ -22,13 +22,13 @@ export function CollapsibleCard({
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 text-left tap"
       >
-        <span className="text-sm font-semibold text-gray-700">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           {title}
           {count !== undefined ? ` · ${count}` : ""}
         </span>
         <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "Ver"}</span>
       </button>
-      {open && <div className="border-t border-gray-100">{children}</div>}
+      {open && <div className="border-t border-gray-100 dark:border-gray-800">{children}</div>}
     </section>
   );
 }

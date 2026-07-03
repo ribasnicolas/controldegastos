@@ -39,15 +39,15 @@ export function EditIncomeSheet({
   return (
     <div className="fixed inset-0 z-30 flex items-end bg-black/40" onClick={onClose}>
       <div
-        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 max-h-[85vh] overflow-y-auto"
+        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 max-h-[85vh] overflow-y-auto dark:bg-gray-900"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <p className="text-base font-semibold text-gray-900">Editar ingreso</p>
+          <p className="text-base font-semibold text-gray-900 dark:text-gray-100">Editar ingreso</p>
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap"
+            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap dark:hover:bg-gray-800"
           >
             ✕
           </button>
@@ -55,15 +55,15 @@ export function EditIncomeSheet({
         <form action={formAction} className="space-y-4">
           <input type="hidden" name="id" value={income.id} />
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Categoría</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</p>
             <CategoryPicker categories={categories} defaultValue={income.category.id} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Ícono (opcional)</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ícono (opcional)</p>
             <IconPicker defaultValue={income.icon} />
           </div>
           <div>
-            <label htmlFor={`edit-income-amount-${income.id}`} className="text-sm font-medium text-gray-700">
+            <label htmlFor={`edit-income-amount-${income.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Monto
             </label>
             <input
@@ -75,11 +75,11 @@ export function EditIncomeSheet({
               min="0"
               required
               defaultValue={income.amount}
-              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label htmlFor={`edit-income-description-${income.id}`} className="text-sm font-medium text-gray-700">
+            <label htmlFor={`edit-income-description-${income.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Descripción (opcional)
             </label>
             <input
@@ -88,11 +88,11 @@ export function EditIncomeSheet({
               type="text"
               maxLength={200}
               defaultValue={income.description ?? ""}
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label htmlFor={`edit-income-date-${income.id}`} className="text-sm font-medium text-gray-700">
+            <label htmlFor={`edit-income-date-${income.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Fecha
             </label>
             <input
@@ -100,7 +100,7 @@ export function EditIncomeSheet({
               name="date"
               type="date"
               defaultValue={new Date(income.date).toISOString().slice(0, 10)}
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}

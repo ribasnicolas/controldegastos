@@ -48,7 +48,7 @@ export default async function GastosPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">Gastos</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Gastos</h1>
       <MonthNav basePath="/gastos" year={year} month={month} />
 
       <ExpenseForm key={`${year}-${month}`} categories={categories} year={year} month={month} />
@@ -94,7 +94,7 @@ export default async function GastosPage({
           count={expenses.length}
           defaultOpen
         >
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
             {expenses.map((expense) => (
               <ExpenseRow
                 key={expense.id}
@@ -116,7 +116,9 @@ export default async function GastosPage({
               />
             ))}
             {expenses.length === 0 && (
-              <p className="px-4 py-6 text-sm text-gray-500 text-center">Todavía no cargaste gastos este mes.</p>
+              <p className="px-4 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">
+                Todavía no cargaste gastos este mes.
+              </p>
             )}
           </div>
         </CollapsibleCard>

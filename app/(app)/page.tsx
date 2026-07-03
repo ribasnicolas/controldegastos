@@ -18,13 +18,13 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-sm text-gray-500">{monthLabel(data.month, data.year)}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{monthLabel(data.month, data.year)}</p>
         <div
           className={`mt-2 rounded-3xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] ${
             data.projectedAvailable >= 0 ? "bg-brand-primary/10" : "bg-brand-danger/10"
           }`}
         >
-          <p className="text-sm text-gray-600">Saldo si pagás los gastos fijos</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Saldo si pagás los gastos fijos</p>
           <p
             className={`text-4xl font-bold tracking-tight ${
               data.projectedAvailable >= 0 ? "text-brand-primary-dark" : "text-brand-danger"
@@ -33,15 +33,15 @@ export default async function DashboardPage() {
             {formatCurrency(data.projectedAvailable)}
           </p>
 
-          <div className="mt-4 pt-4 border-t border-black/10 space-y-2">
+          <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Gastos fijos pendientes</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(data.pendingFixedTotal)}</span>
+              <span className="text-gray-600 dark:text-gray-400">Gastos fijos pendientes</span>
+              <span className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.pendingFixedTotal)}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Saldo real</span>
+              <span className="text-gray-600 dark:text-gray-400">Saldo real</span>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-gray-900">{formatCurrency(data.available)}</span>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.available)}</span>
                 <ActualBalanceWidget actualBalance={data.actualBalance} />
               </div>
             </div>
@@ -51,12 +51,12 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="card-surface p-4">
-          <p className="text-xs text-gray-500">Ingresos del mes</p>
-          <p className="text-lg font-semibold text-gray-900">{formatCurrency(data.totalIncome)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Ingresos del mes</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.totalIncome)}</p>
         </div>
         <div className="card-surface p-4">
-          <p className="text-xs text-gray-500">Gastos del mes</p>
-          <p className="text-lg font-semibold text-gray-900">{formatCurrency(data.totalExpense)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Gastos del mes</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.totalExpense)}</p>
         </div>
       </div>
 
@@ -67,21 +67,21 @@ export default async function DashboardPage() {
               href={`/gastos?y=${data.year}&m=${data.month}&paymentMethod=CREDIT_CARD`}
               className="card-surface p-4 block tap"
             >
-              <p className="text-xs text-gray-500">💳 Tarjeta este mes</p>
-              <p className="text-lg font-semibold text-gray-900">{formatCurrency(data.creditCardExpense)}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">💳 Tarjeta este mes</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.creditCardExpense)}</p>
               <p className="text-xs text-gray-400 mt-1">Se paga el mes que viene</p>
             </Link>
           )}
           {data.debtsPending > 0 && (
             <Link href="/deudas?tab=me-deben" className="card-surface p-4 block tap">
-              <p className="text-xs text-gray-500">🤝 Te deben</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">🤝 Te deben</p>
               <p className="text-lg font-semibold text-brand-primary-dark">{formatCurrency(data.debtsPending)}</p>
               <p className="text-xs text-gray-400 mt-1">Ver deudas</p>
             </Link>
           )}
           {data.pendingLiabilitiesTotal > 0 && (
             <Link href="/deudas?tab=debo" className="card-surface p-4 block tap">
-              <p className="text-xs text-gray-500">💸 Debés este mes</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">💸 Debés este mes</p>
               <p className="text-lg font-semibold text-brand-danger">
                 {formatCurrency(data.pendingLiabilitiesTotal)}
               </p>
@@ -96,15 +96,15 @@ export default async function DashboardPage() {
           href="/hogar"
           className="block rounded-2xl bg-brand-secondary/10 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] tap"
         >
-          <p className="text-xs text-gray-600">Hogar · {data.household.name}</p>
-          <p className="text-lg font-semibold text-gray-900">
+          <p className="text-xs text-gray-600 dark:text-gray-400">Hogar · {data.household.name}</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             Disponible combinado: {formatCurrency(data.household.available)}
           </p>
         </Link>
       )}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-700">Gastos por categoría</h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Gastos por categoría</h2>
         <div className="card-surface p-4">
           <ExpensePieChart data={data.expensesBreakdown} year={data.year} month={data.month} />
           <ul className="mt-2 space-y-1">
@@ -114,10 +114,10 @@ export default async function DashboardPage() {
                   href={`/gastos?y=${data.year}&m=${data.month}&categoryId=${row.categoryId}`}
                   className="flex items-center justify-between text-sm py-1.5 tap"
                 >
-                  <span className="text-gray-700">
+                  <span className="text-gray-700 dark:text-gray-300">
                     {row.icon} {row.name}
                   </span>
-                  <span className="font-medium text-gray-900">{formatCurrency(row.amount)}</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(row.amount)}</span>
                 </Link>
               </li>
             ))}
@@ -126,7 +126,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-700">Estampados</h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Estampados</h2>
         <div className="card-surface p-4 grid grid-cols-2 gap-4">
           {(
             [
@@ -135,11 +135,11 @@ export default async function DashboardPage() {
             ] as const
           ).map(({ label, data: row }) => (
             <div key={label}>
-              <p className="text-xs text-gray-500">{label}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
               <p className={`text-lg font-bold ${row.net >= 0 ? "text-brand-primary-dark" : "text-brand-danger"}`}>
                 {formatCurrency(row.net)}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Ingresos {formatCurrency(row.income)} · Egresos {formatCurrency(row.expense)}
               </p>
             </div>
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
       {data.budgetsBreakdown.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-700">Presupuesto vs. gastado</h2>
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Presupuesto vs. gastado</h2>
             <Link href="/presupuesto" className="text-sm text-brand-primary font-medium">
               Editar
             </Link>
@@ -162,14 +162,14 @@ export default async function DashboardPage() {
               return (
                 <div key={row.categoryId}>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-gray-300">
                       {row.icon} {row.name}
                     </span>
-                    <span className={overBudget ? "text-brand-danger font-medium" : "text-gray-600"}>
+                    <span className={overBudget ? "text-brand-danger font-medium" : "text-gray-600 dark:text-gray-400"}>
                       {formatCurrency(row.spent)} / {formatCurrency(row.budgeted)}
                     </span>
                   </div>
-                  <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                  <div className="h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-300 ${overBudget ? "bg-brand-danger" : "bg-brand-primary"}`}
                       style={{ width: `${pct}%` }}
@@ -183,8 +183,8 @@ export default async function DashboardPage() {
       )}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-700">Últimos movimientos</h2>
-        <div className="card-surface divide-y divide-gray-100">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Últimos movimientos</h2>
+        <div className="card-surface divide-y divide-gray-100 dark:divide-gray-800">
           {[
             ...data.recentExpenses.map((e) => ({
               id: e.id,
@@ -210,18 +210,18 @@ export default async function DashboardPage() {
                 <div className="flex items-center gap-2">
                   <span>{movement.icon}</span>
                   <div>
-                    <p className="text-sm text-gray-900">{movement.label}</p>
-                    <p className="text-xs text-gray-500">{formatDate(movement.date)}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{movement.label}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(movement.date)}</p>
                   </div>
                 </div>
-                <span className={`text-sm font-semibold ${movement.amount < 0 ? "text-gray-900" : "text-brand-primary"}`}>
+                <span className={`text-sm font-semibold ${movement.amount < 0 ? "text-gray-900 dark:text-gray-100" : "text-brand-primary"}`}>
                   {movement.amount < 0 ? "-" : "+"}
                   {formatCurrency(Math.abs(movement.amount))}
                 </span>
               </div>
             ))}
           {data.recentExpenses.length === 0 && data.recentIncomes.length === 0 && (
-            <p className="px-4 py-6 text-sm text-gray-500 text-center">Todavía no hay movimientos.</p>
+            <p className="px-4 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">Todavía no hay movimientos.</p>
           )}
         </div>
       </section>

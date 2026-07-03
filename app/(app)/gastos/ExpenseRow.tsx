@@ -31,8 +31,10 @@ export function ExpenseRow({ expense, categories }: { expense: Expense; categori
         >
           <span>{expense.icon || expense.category.icon}</span>
           <div className="min-w-0">
-            <p className="text-sm text-gray-900 truncate">{expense.description || expense.category.name}</p>
-            <p className="text-xs text-gray-500 truncate">
+            <p className="text-sm text-gray-900 dark:text-gray-100 truncate">
+              {expense.description || expense.category.name}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
               {expense.category.name} · {formatDate(expense.date)}
               {expense.sourceRecurringId ? " · fijo" : ""}
               {expense.paymentMethod === "CREDIT_CARD" ? " · 💳 tarjeta" : ""}
@@ -40,7 +42,9 @@ export function ExpenseRow({ expense, categories }: { expense: Expense; categori
           </div>
         </button>
         <div className="flex items-center gap-3 shrink-0">
-          <span className="text-sm font-semibold text-gray-900">{formatCurrency(expense.amount)}</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {formatCurrency(expense.amount)}
+          </span>
           <ConfirmDeleteForm
             action={deleteExpense.bind(null, expense.id)}
             confirmMessage="¿Eliminar este gasto?"

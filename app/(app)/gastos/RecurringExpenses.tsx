@@ -77,10 +77,10 @@ function RecurringExpenseItem({
   return (
     <div className="flex items-center justify-between px-4 py-3 gap-2">
       <button type="button" onClick={onEdit} className="flex-1 min-w-0 text-left tap">
-        <p className="text-sm text-gray-900 truncate">
+        <p className="text-sm text-gray-900 dark:text-gray-100 truncate">
           {item.category.icon} {item.description || item.category.name}
         </p>
-        <p className="text-xs text-gray-500 truncate">
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
           Día {item.dayOfMonth} · {formatCurrency(Number(item.amount))}
           {item.active && isConfirmed && (
             <span className="text-brand-primary-dark font-medium"> · ✓ Pagado</span>
@@ -89,7 +89,7 @@ function RecurringExpenseItem({
             <span className="text-brand-danger font-semibold"> · ⚠️ Vence mañana</span>
           )}
           {pending && <span className="text-brand-secondary-dark font-medium"> · Pendiente de pago</span>}
-          {notYetDue && <span className="text-gray-400"> · No pagado</span>}
+          {notYetDue && <span className="text-gray-400 dark:text-gray-500"> · No pagado</span>}
         </p>
       </button>
       <div className="flex items-center gap-2 shrink-0">
@@ -107,7 +107,7 @@ function RecurringExpenseItem({
           <ConfirmDeleteForm
             action={undoAction}
             confirmMessage="¿Deshacer el pago? Se borra el gasto que se generó al confirmarlo."
-            className="h-8 px-3 rounded-full text-xs font-medium bg-gray-100 text-gray-500 tap"
+            className="h-8 px-3 rounded-full text-xs font-medium bg-gray-100 text-gray-500 tap dark:bg-gray-800 dark:text-gray-400"
           >
             Deshacer
           </ConfirmDeleteForm>
@@ -116,7 +116,9 @@ function RecurringExpenseItem({
           <button
             type="submit"
             className={`h-8 px-3 rounded-full text-xs font-medium tap ${
-              item.active ? "bg-brand-primary/10 text-brand-primary-dark" : "bg-gray-100 text-gray-500"
+              item.active
+                ? "bg-brand-primary/10 text-brand-primary-dark"
+                : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
             }`}
           >
             {item.active ? "Activo" : "Pausado"}
@@ -165,16 +167,16 @@ export function RecurringExpenses({
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 text-left tap"
       >
-        <span className="text-sm font-semibold text-gray-700">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Gastos fijos (recurrentes){items.length > 0 ? ` · ${items.length}` : ""}
         </span>
         <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "Ver"}</span>
       </button>
 
       {open && (
-        <div className="border-t border-gray-100 p-4 space-y-4">
+        <div className="border-t border-gray-100 p-4 space-y-4 dark:border-gray-800">
           {items.length > 0 && (
-            <div className="rounded-2xl border border-gray-100 divide-y divide-gray-100">
+            <div className="rounded-2xl border border-gray-100 divide-y divide-gray-100 dark:border-gray-800 dark:divide-gray-800">
               {items.map((item) => (
                 <RecurringExpenseItem
                   key={item.id}
@@ -200,14 +202,14 @@ export function RecurringExpenses({
           </div>
 
           {addOpen && (
-            <form ref={formRef} action={formAction} className="space-y-4 rounded-2xl border border-gray-100 p-4">
+            <form ref={formRef} action={formAction} className="space-y-4 rounded-2xl border border-gray-100 p-4 dark:border-gray-800">
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Categoría</p>
+                <p className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Categoría</p>
                 <CategoryPicker categories={categories} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="rec-amount" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="rec-amount" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Monto
                   </label>
                   <input
@@ -218,11 +220,11 @@ export function RecurringExpenses({
                     step="0.01"
                     min="0"
                     required
-                    className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                    className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label htmlFor="rec-day" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="rec-day" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Día del mes
                   </label>
                   <input
@@ -233,12 +235,12 @@ export function RecurringExpenses({
                     max="28"
                     required
                     defaultValue={1}
-                    className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                    className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
                   />
                 </div>
               </div>
               <div>
-                <label htmlFor="rec-description" className="text-sm font-medium text-gray-700">
+                <label htmlFor="rec-description" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Descripción (opcional)
                 </label>
                 <input
@@ -247,7 +249,7 @@ export function RecurringExpenses({
                   type="text"
                   maxLength={200}
                   placeholder="Ej: Alquiler"
-                  className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                  className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
                 />
               </div>
               {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}

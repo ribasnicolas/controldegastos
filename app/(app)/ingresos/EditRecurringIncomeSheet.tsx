@@ -37,15 +37,15 @@ export function EditRecurringIncomeSheet({
   return (
     <div className="fixed inset-0 z-30 flex items-end bg-black/40" onClick={onClose}>
       <div
-        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 max-h-[85vh] overflow-y-auto"
+        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 max-h-[85vh] overflow-y-auto dark:bg-gray-900"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <p className="text-base font-semibold text-gray-900">Editar ingreso fijo</p>
+          <p className="text-base font-semibold text-gray-900 dark:text-gray-100">Editar ingreso fijo</p>
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap"
+            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap dark:hover:bg-gray-800"
           >
             ✕
           </button>
@@ -53,12 +53,12 @@ export function EditRecurringIncomeSheet({
         <form action={formAction} className="space-y-4">
           <input type="hidden" name="id" value={item.id} />
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Categoría</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</p>
             <CategoryPicker categories={categories} defaultValue={item.category.id} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor={`edit-rec-income-amount-${item.id}`} className="text-sm font-medium text-gray-700">
+              <label htmlFor={`edit-rec-income-amount-${item.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Monto
               </label>
               <input
@@ -70,11 +70,11 @@ export function EditRecurringIncomeSheet({
                 min="0"
                 required
                 defaultValue={item.amount}
-                className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
               />
             </div>
             <div>
-              <label htmlFor={`edit-rec-income-day-${item.id}`} className="text-sm font-medium text-gray-700">
+              <label htmlFor={`edit-rec-income-day-${item.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Día del mes
               </label>
               <input
@@ -85,12 +85,12 @@ export function EditRecurringIncomeSheet({
                 max="28"
                 required
                 defaultValue={item.dayOfMonth}
-                className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
               />
             </div>
           </div>
           <div>
-            <label htmlFor={`edit-rec-income-description-${item.id}`} className="text-sm font-medium text-gray-700">
+            <label htmlFor={`edit-rec-income-description-${item.id}`} className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Descripción (opcional)
             </label>
             <input
@@ -99,7 +99,7 @@ export function EditRecurringIncomeSheet({
               type="text"
               maxLength={200}
               defaultValue={item.description ?? ""}
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}

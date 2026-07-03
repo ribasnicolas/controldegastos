@@ -32,7 +32,7 @@ export default async function DeudasPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">Deudas</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Deudas</h1>
       <DeudasTabs
         initialTab={tab === "debo" ? "debo" : "me-deben"}
         debts={debts.map((debt) => ({

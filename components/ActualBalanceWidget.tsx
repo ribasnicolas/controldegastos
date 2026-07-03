@@ -15,7 +15,7 @@ export function ActualBalanceWidget({ actualBalance }: { actualBalance: number |
         className="flex items-center gap-1 text-xs text-brand-primary font-medium tap"
       >
         {actualBalance !== null ? `Tu saldo: ${formatCurrency(actualBalance)}` : "Ingresar tu saldo"}
-        <span className="text-gray-400">✏️</span>
+        <span className="text-gray-400 dark:text-gray-500">✏️</span>
       </button>
 
       {open && <ActualBalanceSheet actualBalance={actualBalance} onClose={() => setOpen(false)} />}

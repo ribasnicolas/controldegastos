@@ -25,22 +25,22 @@ export function ActualBalanceSheet({
   return (
     <div className="fixed inset-0 z-30 flex items-end bg-black/40" onClick={onClose}>
       <div
-        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4"
+        className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] space-y-4 dark:bg-gray-900"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <p className="text-base font-semibold text-gray-900">Tu saldo real</p>
+          <p className="text-base font-semibold text-gray-900 dark:text-gray-100">Tu saldo real</p>
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap"
+            className="h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 tap dark:hover:bg-gray-800"
           >
             ✕
           </button>
         </div>
         <form action={formAction} className="space-y-4">
           <div>
-            <label htmlFor="actualBalance" className="text-sm font-medium text-gray-700">
+            <label htmlFor="actualBalance" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Cuánto tenés realmente
             </label>
             <input
@@ -51,7 +51,7 @@ export function ActualBalanceSheet({
               step="0.01"
               required
               defaultValue={actualBalance ?? ""}
-              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}

@@ -41,7 +41,7 @@ export default async function IngresosPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">Ingresos</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Ingresos</h1>
       <MonthNav basePath="/ingresos" year={year} month={month} />
 
       <IncomeForm key={`${year}-${month}`} categories={categories} year={year} month={month} />
@@ -76,7 +76,7 @@ export default async function IngresosPage({
         count={incomes.length}
         defaultOpen
       >
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {incomes.map((income) => (
             <IncomeRow
               key={income.id}
@@ -97,7 +97,9 @@ export default async function IngresosPage({
             />
           ))}
           {incomes.length === 0 && (
-            <p className="px-4 py-6 text-sm text-gray-500 text-center">Todavía no cargaste ingresos este mes.</p>
+            <p className="px-4 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">
+              Todavía no cargaste ingresos este mes.
+            </p>
           )}
         </div>
       </CollapsibleCard>

@@ -25,14 +25,14 @@ export function LiabilityForm() {
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 text-left tap"
       >
-        <span className="text-sm font-semibold text-gray-700">Cargar deuda</span>
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Cargar deuda</span>
         <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "+ Cargar deuda"}</span>
       </button>
 
       {open && (
-        <form ref={formRef} action={formAction} className="space-y-4 p-4 pt-0 border-t border-gray-100">
+        <form ref={formRef} action={formAction} className="space-y-4 p-4 pt-0 border-t border-gray-100 dark:border-gray-800">
           <div>
-            <label htmlFor="liability-personName" className="text-sm font-medium text-gray-700">
+            <label htmlFor="liability-personName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               A quién le debés
             </label>
             <input
@@ -42,11 +42,11 @@ export function LiabilityForm() {
               required
               maxLength={100}
               placeholder="Ej: Juan"
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label htmlFor="liability-totalAmount" className="text-sm font-medium text-gray-700">
+            <label htmlFor="liability-totalAmount" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Monto total
             </label>
             <input
@@ -58,11 +58,11 @@ export function LiabilityForm() {
               min="0"
               required
               placeholder="0"
-              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           <div>
-            <label htmlFor="liability-installments" className="text-sm font-medium text-gray-700">
+            <label htmlFor="liability-installments" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Cantidad de cuotas
             </label>
             <input
@@ -73,12 +73,14 @@ export function LiabilityForm() {
               max="60"
               required
               defaultValue={1}
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
-            <p className="text-xs text-gray-400 mt-1">Si es más de 1 cuota, la primera se paga el mes que viene.</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              Si es más de 1 cuota, la primera se paga el mes que viene.
+            </p>
           </div>
           <div>
-            <label htmlFor="liability-description" className="text-sm font-medium text-gray-700">
+            <label htmlFor="liability-description" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Descripción (opcional)
             </label>
             <input
@@ -87,7 +89,7 @@ export function LiabilityForm() {
               type="text"
               maxLength={200}
               placeholder="Ej: Préstamo del auto"
-              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
           {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}

@@ -8,11 +8,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-10 backdrop-blur-md bg-white/80 border-b border-black/[0.04] px-4 h-14 flex items-center justify-between">
+      <header className="sticky top-0 z-10 backdrop-blur-md bg-white/80 border-b border-black/[0.04] px-4 h-14 flex items-center justify-between dark:bg-gray-900/80 dark:border-white/[0.06]">
         <HeaderNav />
         <Link href="/mas" className="flex items-center gap-2 tap">
           <span className="text-lg leading-none">⚙️</span>
-          <span className="text-sm text-gray-500">{user.name}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">{user.name}</span>
         </Link>
       </header>
       <main className="flex-1 px-4 pt-4 pb-24 max-w-lg w-full mx-auto">{children}</main>
