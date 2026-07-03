@@ -36,6 +36,15 @@ export function defaultDateForMonth(year: number, month: number) {
   return `${y}-${m}-${d}`;
 }
 
+// Convierte un input type="date" ("YYYY-MM-DD") a un Date. new Date(string) lo
+// interpreta como medianoche UTC, lo que puede caer en el día anterior al
+// mostrarlo en un huso horario negativo (Argentina). Se ancla al mediodía
+// para que el día calendario no cambie sin importar el huso del servidor.
+export function parseDateInput(dateString: string): Date {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day, 12, 0, 0);
+}
+
 export function monthLabel(month: number, year: number) {
   const date = new Date(year, month - 1, 1);
   const label = new Intl.DateTimeFormat("es-AR", { month: "long", year: "numeric" }).format(date);

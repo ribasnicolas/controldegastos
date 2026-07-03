@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/dates";
 import type { ActionState } from "./types";
 
 const debtSchema = z.object({
@@ -31,7 +32,7 @@ export async function createDebt(_prev: ActionState, formData: FormData): Promis
       personName: parsed.data.personName,
       amount: parsed.data.amount,
       description: parsed.data.description,
-      date: parsed.data.date ? new Date(parsed.data.date) : new Date(),
+      date: parsed.data.date ? parseDateInput(parsed.data.date) : new Date(),
     },
   });
 

@@ -19,7 +19,7 @@ export default async function MasPage() {
           <span className="text-gray-400">›</span>
         </Link>
         <Link href="/deudas" className="flex items-center justify-between px-4 py-4">
-          <span className="text-sm font-medium text-gray-900">Me deben</span>
+          <span className="text-sm font-medium text-gray-900">Deudas</span>
           <span className="text-gray-400">›</span>
         </Link>
         <Link href="/hogar" className="flex items-center justify-between px-4 py-4">

@@ -141,8 +141,9 @@ export async function deleteRecurringIncome(id: string) {
 }
 
 /**
- * El usuario confirma que un gasto fijo ya vencido este mes fue pagado:
- * recién en este momento se crea el Expense real y se descuenta del total.
+ * El usuario confirma que un gasto fijo fue pagado este mes (puede ser antes
+ * de su día de vencimiento): recién en este momento se crea el Expense real
+ * y se descuenta del total.
  */
 export async function confirmRecurringExpensePayment(
   id: string,
@@ -151,7 +152,6 @@ export async function confirmRecurringExpensePayment(
 ): Promise<ActionState> {
   const user = await requireUser();
   const now = new Date();
-  const day = now.getDate();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
@@ -161,9 +161,6 @@ export async function confirmRecurringExpensePayment(
   }
   if (!item.active) {
     return { error: "Este gasto fijo está pausado" };
-  }
-  if (item.dayOfMonth > day) {
-    return { error: `Todavía no llegó el día ${item.dayOfMonth}` };
   }
   if (item.lastGeneratedMonth === month && item.lastGeneratedYear === year) {
     return { error: "Ya estaba marcado como pagado este mes" };

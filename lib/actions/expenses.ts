@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
+import { parseDateInput } from "@/lib/dates";
 import type { ActionState } from "./types";
 
 const expenseSchema = z.object({
@@ -41,7 +42,7 @@ export async function createExpense(_prev: ActionState, formData: FormData): Pro
       description: parsed.data.description,
       icon: parsed.data.icon,
       paymentMethod: parsed.data.paymentMethod,
-      date: parsed.data.date ? new Date(parsed.data.date) : new Date(),
+      date: parsed.data.date ? parseDateInput(parsed.data.date) : new Date(),
     },
   });
 
@@ -73,7 +74,7 @@ export async function updateExpense(_prev: ActionState, formData: FormData): Pro
       description: parsed.data.description ?? null,
       icon: parsed.data.icon ?? null,
       paymentMethod: parsed.data.paymentMethod,
-      date: parsed.data.date ? new Date(parsed.data.date) : undefined,
+      date: parsed.data.date ? parseDateInput(parsed.data.date) : undefined,
     },
   });
   if (result.count === 0) {

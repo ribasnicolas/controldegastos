@@ -62,14 +62,17 @@ function RecurringExpenseItem({
     if (undoState.error) toast.error(undoState.error);
   }, [undoState]);
 
-  // Fuera del mes actual (planificando o mirando para atrás) se considera
-  // todo "vencido": no tiene sentido esperar a un día que ya no es hoy.
-  const isDue = item.active && (!isCurrentMonth || item.dayOfMonth <= today);
   const isConfirmed = item.lastGeneratedMonth === browsedMonth && item.lastGeneratedYear === browsedYear;
-  const pending = isDue && !isConfirmed;
-  // Solo se puede confirmar el pago real del mes actual, no de un mes que
-  // todavía no llegó (o que ya pasó).
-  const canConfirm = isCurrentMonth && pending;
+  const daysUntilDue = item.dayOfMonth - today;
+  // Fuera del mes actual (planificando o mirando para atrás) todo se
+  // considera "vencido": no tiene sentido esperar a un día que ya no es hoy.
+  const isOverdueOrToday = !isCurrentMonth || daysUntilDue <= 0;
+  const isUrgent = isCurrentMonth && daysUntilDue === 1;
+  const pending = item.active && !isConfirmed && isOverdueOrToday;
+  const notYetDue = item.active && !isConfirmed && !isOverdueOrToday && !isUrgent;
+  // Se puede pagar cualquier día del mes actual, incluso antes de la fecha
+  // de vencimiento. Solo no se puede confirmar un mes que no es el real.
+  const canConfirm = isCurrentMonth && item.active && !isConfirmed;
 
   return (
     <div className="flex items-center justify-between px-4 py-3 gap-2">
@@ -82,8 +85,11 @@ function RecurringExpenseItem({
           {item.active && isConfirmed && (
             <span className="text-brand-primary-dark font-medium"> · ✓ Pagado</span>
           )}
+          {item.active && isUrgent && !isConfirmed && (
+            <span className="text-brand-danger font-semibold"> · ⚠️ Vence mañana</span>
+          )}
           {pending && <span className="text-brand-secondary-dark font-medium"> · Pendiente de pago</span>}
-          {item.active && !isDue && !isConfirmed && <span className="text-gray-400"> · No pagado</span>}
+          {notYetDue && <span className="text-gray-400"> · No pagado</span>}
         </p>
       </button>
       <div className="flex items-center gap-2 shrink-0">

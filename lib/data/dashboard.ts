@@ -23,6 +23,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     activeRecurringExpenses,
     debtsAgg,
     currentUser,
+    liabilities,
   ] = await Promise.all([
     prisma.expense.groupBy({
       by: ["categoryId"],
@@ -73,6 +74,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     prisma.recurringExpense.findMany({ where: { userId, active: true } }),
     prisma.debt.aggregate({ where: { userId, settled: false }, _sum: { amount: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { actualBalance: true } }),
+    prisma.liability.findMany({ where: { userId } }),
   ]);
 
   const categoryById = new Map(categories.map((c) => [c.id, c]));
@@ -93,9 +95,20 @@ export async function getDashboardData(userId: string, householdId: string | nul
   const available = totalIncome - (totalExpense - creditCardExpense);
 
   // Gastos fijos activos que todavía no fueron confirmados como pagados este mes.
-  const pendingFixedTotal = activeRecurringExpenses
+  const pendingRecurringTotal = activeRecurringExpenses
     .filter((item) => !(item.lastGeneratedMonth === month && item.lastGeneratedYear === year))
     .reduce((sum, item) => sum + Number(item.amount), 0);
+  // Deudas propias (simples o en cuotas) cuya cuota de este mes ya empezó
+  // a correr y todavía no se pagó.
+  const pendingLiabilitiesTotal = liabilities
+    .filter((liability) => {
+      const notComplete = liability.installmentsPaid < liability.installments;
+      const hasStarted = year > liability.startYear || (year === liability.startYear && month >= liability.startMonth);
+      const notPaidThisMonth = !(liability.lastPaidMonth === month && liability.lastPaidYear === year);
+      return notComplete && hasStarted && notPaidThisMonth;
+    })
+    .reduce((sum, liability) => sum + Number(liability.totalAmount) / liability.installments, 0);
+  const pendingFixedTotal = pendingRecurringTotal + pendingLiabilitiesTotal;
   const projectedAvailable = available - pendingFixedTotal;
   const debtsPending = Number(debtsAgg._sum.amount ?? 0);
   const actualBalance = currentUser?.actualBalance != null ? Number(currentUser.actualBalance) : null;

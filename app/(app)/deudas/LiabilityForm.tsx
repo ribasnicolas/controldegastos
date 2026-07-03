@@ -1,0 +1,99 @@
+"use client";
+
+import { useActionState, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { createLiability } from "@/lib/actions/liabilities";
+import { SubmitButton } from "@/components/ui/SubmitButton";
+import { initialActionState } from "@/lib/actions/types";
+
+export function LiabilityForm() {
+  const [state, formAction] = useActionState(createLiability, initialActionState);
+  const [open, setOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success("Deuda guardada");
+      formRef.current?.reset();
+    }
+  }, [state]);
+
+  return (
+    <section className="card-surface">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left tap"
+      >
+        <span className="text-sm font-semibold text-gray-700">Cargar deuda</span>
+        <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "+ Cargar deuda"}</span>
+      </button>
+
+      {open && (
+        <form ref={formRef} action={formAction} className="space-y-4 p-4 pt-0 border-t border-gray-100">
+          <div>
+            <label htmlFor="liability-personName" className="text-sm font-medium text-gray-700">
+              A quién le debés
+            </label>
+            <input
+              id="liability-personName"
+              name="personName"
+              type="text"
+              required
+              maxLength={100}
+              placeholder="Ej: Juan"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+          </div>
+          <div>
+            <label htmlFor="liability-totalAmount" className="text-sm font-medium text-gray-700">
+              Monto total
+            </label>
+            <input
+              id="liability-totalAmount"
+              name="totalAmount"
+              type="number"
+              inputMode="decimal"
+              step="0.01"
+              min="0"
+              required
+              placeholder="0"
+              className="w-full h-14 rounded-xl border border-gray-300 px-4 text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+          </div>
+          <div>
+            <label htmlFor="liability-installments" className="text-sm font-medium text-gray-700">
+              Cantidad de cuotas
+            </label>
+            <input
+              id="liability-installments"
+              name="installments"
+              type="number"
+              min="1"
+              max="60"
+              required
+              defaultValue={1}
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+            <p className="text-xs text-gray-400 mt-1">Si es más de 1 cuota, la primera se paga el mes que viene.</p>
+          </div>
+          <div>
+            <label htmlFor="liability-description" className="text-sm font-medium text-gray-700">
+              Descripción (opcional)
+            </label>
+            <input
+              id="liability-description"
+              name="description"
+              type="text"
+              maxLength={200}
+              placeholder="Ej: Préstamo del auto"
+              className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+          </div>
+          {state.error && <p className="text-sm text-brand-danger">{state.error}</p>}
+          <SubmitButton>Guardar deuda</SubmitButton>
+        </form>
+      )}
+    </section>
+  );
+}
