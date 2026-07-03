@@ -34,13 +34,15 @@ export function DeudasTabs({
   totalPending,
   liabilities,
   totalOwed,
+  initialTab = "me-deben",
 }: {
   debts: Debt[];
   totalPending: number;
   liabilities: Liability[];
   totalOwed: number;
+  initialTab?: "me-deben" | "debo";
 }) {
-  const [tab, setTab] = useState<"me-deben" | "debo">("me-deben");
+  const [tab, setTab] = useState<"me-deben" | "debo">(initialTab);
 
   return (
     <div className="space-y-6">

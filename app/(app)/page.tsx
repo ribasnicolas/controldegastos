@@ -9,6 +9,11 @@ import { ActualBalanceWidget } from "@/components/ActualBalanceWidget";
 export default async function DashboardPage() {
   const user = await requireUser();
   const data = await getDashboardData(user.id, user.householdId);
+  const visibleWidgetCount = [
+    data.creditCardExpense > 0,
+    data.debtsPending > 0,
+    data.pendingLiabilitiesTotal > 0,
+  ].filter(Boolean).length;
 
   return (
     <div className="space-y-8">
@@ -55,8 +60,8 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {(data.creditCardExpense > 0 || data.debtsPending > 0) && (
-        <div className={data.creditCardExpense > 0 && data.debtsPending > 0 ? "grid grid-cols-2 gap-3" : ""}>
+      {visibleWidgetCount > 0 && (
+        <div className={visibleWidgetCount > 1 ? "grid grid-cols-2 gap-3" : ""}>
           {data.creditCardExpense > 0 && (
             <Link
               href={`/gastos?y=${data.year}&m=${data.month}&paymentMethod=CREDIT_CARD`}
@@ -68,9 +73,18 @@ export default async function DashboardPage() {
             </Link>
           )}
           {data.debtsPending > 0 && (
-            <Link href="/deudas" className="card-surface p-4 block tap">
+            <Link href="/deudas?tab=me-deben" className="card-surface p-4 block tap">
               <p className="text-xs text-gray-500">🤝 Te deben</p>
               <p className="text-lg font-semibold text-brand-primary-dark">{formatCurrency(data.debtsPending)}</p>
+              <p className="text-xs text-gray-400 mt-1">Ver deudas</p>
+            </Link>
+          )}
+          {data.pendingLiabilitiesTotal > 0 && (
+            <Link href="/deudas?tab=debo" className="card-surface p-4 block tap">
+              <p className="text-xs text-gray-500">💸 Debés este mes</p>
+              <p className="text-lg font-semibold text-brand-danger">
+                {formatCurrency(data.pendingLiabilitiesTotal)}
+              </p>
               <p className="text-xs text-gray-400 mt-1">Ver deudas</p>
             </Link>
           )}

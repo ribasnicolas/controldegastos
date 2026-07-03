@@ -2,8 +2,13 @@ import { requireUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { DeudasTabs } from "./DeudasTabs";
 
-export default async function DeudasPage() {
+export default async function DeudasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const user = await requireUser();
+  const { tab } = await searchParams;
 
   const [debts, liabilities] = await Promise.all([
     prisma.debt.findMany({
@@ -29,6 +34,7 @@ export default async function DeudasPage() {
     <div className="space-y-6">
       <h1 className="text-xl font-bold text-gray-900">Deudas</h1>
       <DeudasTabs
+        initialTab={tab === "debo" ? "debo" : "me-deben"}
         debts={debts.map((debt) => ({
           id: debt.id,
           personName: debt.personName,

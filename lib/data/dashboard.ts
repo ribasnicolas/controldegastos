@@ -173,6 +173,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     available,
     creditCardExpense,
     pendingFixedTotal,
+    pendingLiabilitiesTotal,
     projectedAvailable,
     debtsPending,
     actualBalance,
