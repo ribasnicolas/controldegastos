@@ -21,7 +21,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
     estampadosYearIncome,
     creditCardAgg,
     activeRecurringExpenses,
-    debtsAgg,
+    debts,
     currentUser,
     liabilities,
   ] = await Promise.all([
@@ -72,7 +72,7 @@ export async function getDashboardData(userId: string, householdId: string | nul
       _sum: { amount: true },
     }),
     prisma.recurringExpense.findMany({ where: { userId, active: true } }),
-    prisma.debt.aggregate({ where: { userId, settled: false }, _sum: { amount: true } }),
+    prisma.debt.findMany({ where: { userId, settled: false } }),
     prisma.user.findUnique({ where: { id: userId }, select: { actualBalance: true } }),
     prisma.liability.findMany({ where: { userId } }),
   ]);
@@ -110,7 +110,10 @@ export async function getDashboardData(userId: string, householdId: string | nul
     .reduce((sum, liability) => sum + Number(liability.totalAmount) / liability.installments, 0);
   const pendingFixedTotal = pendingRecurringTotal + pendingLiabilitiesTotal;
   const projectedAvailable = available - pendingFixedTotal;
-  const debtsPending = Number(debtsAgg._sum.amount ?? 0);
+  const debtsPending = debts.reduce((sum, debt) => {
+    const remaining = debt.installments - debt.installmentsPaid;
+    return sum + (Number(debt.amount) / debt.installments) * remaining;
+  }, 0);
   const actualBalance = currentUser?.actualBalance != null ? Number(currentUser.actualBalance) : null;
 
   const budgetsBreakdown = budgets.map((budget) => {

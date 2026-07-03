@@ -13,12 +13,14 @@ const liabilitySchema = z.object({
   personName: z.string().min(1, "Ingresá a quién le debés").max(100),
   totalAmount: z.coerce.number().positive("El monto debe ser mayor a 0"),
   installments: z.coerce.number().int().min(1).max(60).default(1),
+  startWhen: z.enum(["this-month", "next-month"]).default("this-month"),
   description: z.string().max(200).optional(),
 });
 
 /**
- * Registra una deuda que vos debés. Si es en cuotas, la primera se puede
- * pagar recién el mes que viene; si es un pago único, se puede pagar ya.
+ * Registra una deuda que vos debés. Si es en cuotas, la primera se paga el
+ * mes que viene; si es un pago único, vos elegís si arranca este mes o el
+ * que viene.
  */
 export async function createLiability(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
@@ -26,6 +28,7 @@ export async function createLiability(_prev: ActionState, formData: FormData): P
     personName: formData.get("personName"),
     totalAmount: formData.get("totalAmount"),
     installments: formData.get("installments") || undefined,
+    startWhen: formData.get("startWhen") || undefined,
     description: formData.get("description") || undefined,
   });
   if (!parsed.success) {
@@ -36,7 +39,9 @@ export async function createLiability(_prev: ActionState, formData: FormData): P
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
   const start =
-    parsed.data.installments > 1 ? shiftMonth(currentYear, currentMonth, 1) : { year: currentYear, month: currentMonth };
+    parsed.data.installments > 1 || parsed.data.startWhen === "next-month"
+      ? shiftMonth(currentYear, currentMonth, 1)
+      : { year: currentYear, month: currentMonth };
 
   await prisma.liability.create({
     data: {

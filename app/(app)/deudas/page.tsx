@@ -21,9 +21,10 @@ export default async function DeudasPage({
     }),
   ]);
 
-  const totalPending = debts
-    .filter((debt) => !debt.settled)
-    .reduce((sum, debt) => sum + Number(debt.amount), 0);
+  const totalPending = debts.reduce((sum, debt) => {
+    const remaining = debt.installments - debt.installmentsPaid;
+    return sum + (Number(debt.amount) / debt.installments) * remaining;
+  }, 0);
 
   const totalOwed = liabilities.reduce((sum, liability) => {
     const remaining = liability.installments - liability.installmentsPaid;
@@ -39,9 +40,13 @@ export default async function DeudasPage({
           id: debt.id,
           personName: debt.personName,
           amount: Number(debt.amount),
+          installments: debt.installments,
+          installmentsPaid: debt.installmentsPaid,
           description: debt.description,
-          settled: debt.settled,
-          date: debt.date,
+          startMonth: debt.startMonth,
+          startYear: debt.startYear,
+          lastCollectedMonth: debt.lastCollectedMonth,
+          lastCollectedYear: debt.lastCollectedYear,
         }))}
         totalPending={totalPending}
         liabilities={liabilities.map((liability) => ({

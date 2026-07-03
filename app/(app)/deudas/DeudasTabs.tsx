@@ -11,9 +11,13 @@ type Debt = {
   id: string;
   personName: string;
   amount: number;
+  installments: number;
+  installmentsPaid: number;
   description: string | null;
-  settled: boolean;
-  date: Date;
+  startMonth: number;
+  startYear: number;
+  lastCollectedMonth: number | null;
+  lastCollectedYear: number | null;
 };
 
 type Liability = {

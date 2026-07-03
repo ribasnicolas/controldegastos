@@ -3,12 +3,14 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { createLiability } from "@/lib/actions/liabilities";
+import { SegmentedToggle } from "@/components/ui/SegmentedToggle";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { initialActionState } from "@/lib/actions/types";
 
 export function LiabilityForm() {
   const [state, formAction] = useActionState(createLiability, initialActionState);
   const [open, setOpen] = useState(false);
+  const [installments, setInstallments] = useState(1);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -73,12 +75,28 @@ export function LiabilityForm() {
               max="60"
               required
               defaultValue={1}
+              onChange={(e) => setInstallments(Number(e.target.value) || 1)}
               className="w-full h-12 rounded-xl border border-gray-300 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              Si es más de 1 cuota, la primera se paga el mes que viene.
-            </p>
+            {installments > 1 && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                La primera cuota se paga el mes que viene.
+              </p>
+            )}
           </div>
+          {installments === 1 && (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">¿Cuándo se paga?</p>
+              <SegmentedToggle
+                name="startWhen"
+                defaultValue="this-month"
+                options={[
+                  { value: "this-month", label: "Este mes" },
+                  { value: "next-month", label: "El mes que viene" },
+                ]}
+              />
+            </div>
+          )}
           <div>
             <label htmlFor="liability-description" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Descripción (opcional)
