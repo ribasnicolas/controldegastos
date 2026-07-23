@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { getDashboardData } from "@/lib/data/dashboard";
+import { getMonthProjection } from "@/lib/data/projection";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { monthLabel } from "@/lib/dates";
+import { monthLabel, shiftMonth } from "@/lib/dates";
 import { ExpensePieChart } from "@/components/ExpensePieChart";
 import { ActualBalanceWidget } from "@/components/ActualBalanceWidget";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   const data = await getDashboardData(user.id, user.householdId);
+  const nextMonth = shiftMonth(data.year, data.month, 1);
+  const nextMonthProjection = await getMonthProjection(user.id, nextMonth.year, nextMonth.month);
   const visibleWidgetCount = [
     data.creditCardExpense > 0,
     data.debtsPending > 0,
@@ -90,6 +93,22 @@ export default async function DashboardPage() {
           )}
         </div>
       )}
+
+      <Link href="/proyeccion" className="block card-surface p-4 tap">
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            📅 Proyección de {monthLabel(nextMonth.month, nextMonth.year).toLowerCase()}
+          </p>
+          <span className="text-gray-400">›</span>
+        </div>
+        <p
+          className={`text-lg font-semibold ${
+            nextMonthProjection.projectedAvailable >= 0 ? "text-brand-primary-dark" : "text-brand-danger"
+          }`}
+        >
+          {formatCurrency(nextMonthProjection.projectedAvailable)}
+        </p>
+      </Link>
 
       {data.household && (
         <Link

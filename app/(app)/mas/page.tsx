@@ -10,6 +10,10 @@ export default async function MasPage() {
       <h1 className="text-xl font-bold text-gray-900">Más</h1>
 
       <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100">
+        <Link href="/proyeccion" className="flex items-center justify-between px-4 py-4">
+          <span className="text-sm font-medium text-gray-900">Proyección de próximos meses</span>
+          <span className="text-gray-400">›</span>
+        </Link>
         <Link href="/presupuesto" className="flex items-center justify-between px-4 py-4">
           <span className="text-sm font-medium text-gray-900">Presupuesto mensual</span>
           <span className="text-gray-400">›</span>
