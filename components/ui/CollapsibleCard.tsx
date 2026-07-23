@@ -5,11 +5,13 @@ import { useState } from "react";
 export function CollapsibleCard({
   title,
   count,
+  right,
   defaultOpen = false,
   children,
 }: {
   title: string;
   count?: number;
+  right?: React.ReactNode;
   defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
@@ -26,7 +28,10 @@ export function CollapsibleCard({
           {title}
           {count !== undefined ? ` · ${count}` : ""}
         </span>
-        <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "Ver"}</span>
+        <span className="flex items-center gap-3">
+          {right}
+          <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "Ver"}</span>
+        </span>
       </button>
       {open && <div className="border-t border-gray-100 dark:border-gray-800">{children}</div>}
     </section>

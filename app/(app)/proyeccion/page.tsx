@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/session";
 import { getMonthProjection } from "@/lib/data/projection";
 import { formatCurrency } from "@/lib/format";
 import { monthLabel, shiftMonth } from "@/lib/dates";
+import { CollapsibleCard } from "@/components/ui/CollapsibleCard";
 
 export default async function ProyeccionPage({
   searchParams,
@@ -20,6 +21,10 @@ export default async function ProyeccionPage({
   const prev = shiftMonth(year, month, -1);
   const next = shiftMonth(year, month, 1);
   const isNextMonth = year === defaultTarget.year && month === defaultTarget.month;
+
+  const barTotal = data.projectedIncome + data.projectedExpense;
+  const incomePct = barTotal > 0 ? (data.projectedIncome / barTotal) * 100 : 50;
+  const expensePct = 100 - incomePct;
 
   return (
     <div className="space-y-6">
@@ -66,94 +71,115 @@ export default async function ProyeccionPage({
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Con lo que ya cargaste para este mes más los fijos, cuotas y cobros esperados.
         </p>
+
+        <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10 space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-brand-primary-dark font-medium">Ingresos {formatCurrency(data.projectedIncome)}</span>
+            <span className="text-brand-danger font-medium">Gastos {formatCurrency(data.projectedExpense)}</span>
+          </div>
+          <div className="h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden flex">
+            <div className="h-full bg-brand-primary" style={{ width: `${incomePct}%` }} />
+            <div className="h-full bg-brand-danger" style={{ width: `${expensePct}%` }} />
+          </div>
+        </div>
       </div>
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Ingresos proyectados</h2>
-        <div className="card-surface p-4 space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Total proyectado</span>
-            <span className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.projectedIncome)}</span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <Link href={`/ingresos?y=${year}&m=${month}`} className="text-gray-600 dark:text-gray-400 tap">
-              Ya cargados este mes
-            </Link>
-            <span className="text-gray-900 dark:text-gray-100">{formatCurrency(data.actualIncome)}</span>
-          </div>
-          {data.expectedRecurringIncomeTotal > 0 && (
-            <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
-              <p className="text-xs text-gray-500 dark:text-gray-400">Ingresos fijos esperados</p>
-              {data.recurringIncomeItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700 dark:text-gray-300">
-                    {item.icon} {item.name}
-                  </span>
-                  <span className="text-gray-900 dark:text-gray-100">{formatCurrency(item.amount)}</span>
-                </div>
-              ))}
+        <CollapsibleCard
+          title="Detalle de ingresos"
+          right={
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {formatCurrency(data.projectedIncome)}
+            </span>
+          }
+        >
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <Link href={`/ingresos?y=${year}&m=${month}`} className="text-gray-600 dark:text-gray-400 tap">
+                Ya cargados este mes
+              </Link>
+              <span className="text-gray-900 dark:text-gray-100">{formatCurrency(data.actualIncome)}</span>
             </div>
-          )}
-          {data.expectedDebtTotal > 0 && (
-            <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
-              <p className="text-xs text-gray-500 dark:text-gray-400">Cobros de deudas esperados</p>
-              {data.debtItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700 dark:text-gray-300">🤝 {item.name}</span>
-                  <span className="text-gray-900 dark:text-gray-100">{formatCurrency(item.amount)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+            {data.expectedRecurringIncomeTotal > 0 && (
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Ingresos fijos esperados</p>
+                {data.recurringIncomeItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {item.icon} {item.name}
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">{formatCurrency(item.amount)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {data.expectedDebtTotal > 0 && (
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Cobros de deudas esperados</p>
+                {data.debtItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700 dark:text-gray-300">🤝 {item.name}</span>
+                    <span className="text-gray-900 dark:text-gray-100">{formatCurrency(item.amount)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CollapsibleCard>
       </section>
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Gastos proyectados</h2>
-        <div className="card-surface p-4 space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Total proyectado</span>
-            <span className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.projectedExpense)}</span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <Link href={`/gastos?y=${year}&m=${month}`} className="text-gray-600 dark:text-gray-400 tap">
-              Ya cargados este mes
-            </Link>
-            <span className="text-gray-900 dark:text-gray-100">{formatCurrency(data.actualExpense)}</span>
-          </div>
-          {data.expectedRecurringExpenseTotal > 0 && (
-            <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
-              <p className="text-xs text-gray-500 dark:text-gray-400">Gastos fijos esperados</p>
-              {data.recurringExpenseItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700 dark:text-gray-300">
-                    {item.icon} {item.name}
-                  </span>
-                  <span className="text-gray-900 dark:text-gray-100">{formatCurrency(item.amount)}</span>
-                </div>
-              ))}
+        <CollapsibleCard
+          title="Detalle de gastos"
+          right={
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {formatCurrency(data.projectedExpense)}
+            </span>
+          }
+        >
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <Link href={`/gastos?y=${year}&m=${month}`} className="text-gray-600 dark:text-gray-400 tap">
+                Ya cargados este mes
+              </Link>
+              <span className="text-gray-900 dark:text-gray-100">{formatCurrency(data.actualExpense)}</span>
             </div>
-          )}
-          {data.expectedLiabilityTotal > 0 && (
-            <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
-              <p className="text-xs text-gray-500 dark:text-gray-400">Cuotas a pagar esperadas</p>
-              {data.liabilityItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700 dark:text-gray-300">💸 {item.name}</span>
-                  <span className="text-gray-900 dark:text-gray-100">{formatCurrency(item.amount)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          {data.creditCardExpense > 0 && (
-            <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">💳 Tarjeta (se paga el mes siguiente)</span>
-                <span className="text-gray-900 dark:text-gray-100">{formatCurrency(data.creditCardExpense)}</span>
+            {data.expectedRecurringExpenseTotal > 0 && (
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Gastos fijos esperados</p>
+                {data.recurringExpenseItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {item.icon} {item.name}
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">{formatCurrency(item.amount)}</span>
+                  </div>
+                ))}
               </div>
-            </div>
-          )}
-        </div>
+            )}
+            {data.expectedLiabilityTotal > 0 && (
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Cuotas a pagar esperadas</p>
+                {data.liabilityItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700 dark:text-gray-300">💸 {item.name}</span>
+                    <span className="text-gray-900 dark:text-gray-100">{formatCurrency(item.amount)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {data.creditCardExpense > 0 && (
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">💳 Tarjeta (se paga el mes siguiente)</span>
+                  <span className="text-gray-900 dark:text-gray-100">{formatCurrency(data.creditCardExpense)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </CollapsibleCard>
       </section>
     </div>
   );
