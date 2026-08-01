@@ -165,7 +165,7 @@ export default async function DashboardPage() {
           {(
             [
               { label: "Este mes", data: data.estampados.month },
-              { label: `Año ${data.year}`, data: data.estampados.year },
+              { label: "Balance general", data: data.estampados.total },
             ] as const
           ).map(({ label, data: row }) => (
             <div key={label}>

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { currentMonthRange, yearRange } from "@/lib/dates";
+import { currentMonthRange } from "@/lib/dates";
 
 const ESTAMPADOS_EXPENSE_CATEGORY = "Insumos Estampados";
 const ESTAMPADOS_INCOME_CATEGORY = "Estampados";
@@ -7,7 +7,6 @@ const ESTAMPADOS_INCOME_CATEGORY = "Estampados";
 export async function getDashboardData(userId: string, householdId: string | null) {
   const now = new Date();
   const { start, end, month, year } = currentMonthRange(now);
-  const { start: yearStart, end: yearEnd } = yearRange(year);
 
   const [
     expensesByCategory,
@@ -18,8 +17,8 @@ export async function getDashboardData(userId: string, householdId: string | nul
     recentIncomes,
     estampadosMonthExpense,
     estampadosMonthIncome,
-    estampadosYearExpense,
-    estampadosYearIncome,
+    estampadosAllExpense,
+    estampadosAllIncome,
     creditCardAgg,
     activeRecurringExpenses,
     debts,
@@ -61,11 +60,11 @@ export async function getDashboardData(userId: string, householdId: string | nul
       _sum: { amount: true },
     }),
     prisma.expense.aggregate({
-      where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_EXPENSE_CATEGORY } },
+      where: { userId, category: { name: ESTAMPADOS_EXPENSE_CATEGORY } },
       _sum: { amount: true },
     }),
     prisma.income.aggregate({
-      where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_INCOME_CATEGORY } },
+      where: { userId, category: { name: ESTAMPADOS_INCOME_CATEGORY } },
       _sum: { amount: true },
     }),
     prisma.expense.aggregate({
@@ -132,13 +131,13 @@ export async function getDashboardData(userId: string, householdId: string | nul
     income: Number(estampadosMonthIncome._sum.amount ?? 0),
     expense: Number(estampadosMonthExpense._sum.amount ?? 0),
   };
-  const estampadosYear = {
-    income: Number(estampadosYearIncome._sum.amount ?? 0),
-    expense: Number(estampadosYearExpense._sum.amount ?? 0),
+  const estampadosAll = {
+    income: Number(estampadosAllIncome._sum.amount ?? 0),
+    expense: Number(estampadosAllExpense._sum.amount ?? 0),
   };
   const estampados = {
     month: { ...estampadosMonth, net: estampadosMonth.income - estampadosMonth.expense },
-    year: { ...estampadosYear, net: estampadosYear.income - estampadosYear.expense },
+    total: { ...estampadosAll, net: estampadosAll.income - estampadosAll.expense },
   };
 
   let household: { name: string; totalIncome: number; totalExpense: number; available: number } | null = null;
