@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { currentMonthRange, yearRange } from "@/lib/dates";
 
-const ESTAMPADOS_CATEGORY = "Estampados";
+const ESTAMPADOS_EXPENSE_CATEGORY = "Insumos Estampados";
+const ESTAMPADOS_INCOME_CATEGORY = "Estampados";
 
 export async function getDashboardData(userId: string, householdId: string | null) {
   const now = new Date();
@@ -52,19 +53,19 @@ export async function getDashboardData(userId: string, householdId: string | nul
       include: { category: true },
     }),
     prisma.expense.aggregate({
-      where: { userId, date: { gte: start, lt: end }, category: { name: ESTAMPADOS_CATEGORY } },
+      where: { userId, date: { gte: start, lt: end }, category: { name: ESTAMPADOS_EXPENSE_CATEGORY } },
       _sum: { amount: true },
     }),
     prisma.income.aggregate({
-      where: { userId, date: { gte: start, lt: end }, category: { name: ESTAMPADOS_CATEGORY } },
+      where: { userId, date: { gte: start, lt: end }, category: { name: ESTAMPADOS_INCOME_CATEGORY } },
       _sum: { amount: true },
     }),
     prisma.expense.aggregate({
-      where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_CATEGORY } },
+      where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_EXPENSE_CATEGORY } },
       _sum: { amount: true },
     }),
     prisma.income.aggregate({
-      where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_CATEGORY } },
+      where: { userId, date: { gte: yearStart, lt: yearEnd }, category: { name: ESTAMPADOS_INCOME_CATEGORY } },
       _sum: { amount: true },
     }),
     prisma.expense.aggregate({

@@ -6,6 +6,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { monthLabel, shiftMonth } from "@/lib/dates";
 import { ExpensePieChart } from "@/components/ExpensePieChart";
 import { ActualBalanceWidget } from "@/components/ActualBalanceWidget";
+import { CollapsibleCard } from "@/components/ui/CollapsibleCard";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -17,6 +18,9 @@ export default async function DashboardPage() {
     data.debtsPending > 0,
     data.pendingLiabilitiesTotal > 0,
   ].filter(Boolean).length;
+  const barTotal = data.totalIncome + data.totalExpense;
+  const incomePct = barTotal > 0 ? (data.totalIncome / barTotal) * 100 : 50;
+  const expensePct = 100 - incomePct;
 
   return (
     <div className="space-y-8">
@@ -47,6 +51,17 @@ export default async function DashboardPage() {
                 <span className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.available)}</span>
                 <ActualBalanceWidget actualBalance={data.actualBalance} />
               </div>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10 space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-brand-primary-dark font-medium">Ingresos {formatCurrency(data.totalIncome)}</span>
+              <span className="text-brand-danger font-medium">Gastos {formatCurrency(data.totalExpense)}</span>
+            </div>
+            <div className="h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden flex">
+              <div className="h-full bg-brand-primary" style={{ width: `${incomePct}%` }} />
+              <div className="h-full bg-brand-danger" style={{ width: `${expensePct}%` }} />
             </div>
           </div>
         </div>
@@ -174,30 +189,32 @@ export default async function DashboardPage() {
               Editar
             </Link>
           </div>
-          <div className="card-surface p-4 space-y-4">
-            {data.budgetsBreakdown.map((row) => {
-              const pct = row.budgeted > 0 ? Math.min(100, (row.spent / row.budgeted) * 100) : 0;
-              const overBudget = row.spent > row.budgeted;
-              return (
-                <div key={row.categoryId}>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-gray-700 dark:text-gray-300">
-                      {row.icon} {row.name}
-                    </span>
-                    <span className={overBudget ? "text-brand-danger font-medium" : "text-gray-600 dark:text-gray-400"}>
-                      {formatCurrency(row.spent)} / {formatCurrency(row.budgeted)}
-                    </span>
+          <CollapsibleCard title="Detalle por categoría" count={data.budgetsBreakdown.length}>
+            <div className="p-4 space-y-4">
+              {data.budgetsBreakdown.map((row) => {
+                const pct = row.budgeted > 0 ? Math.min(100, (row.spent / row.budgeted) * 100) : 0;
+                const overBudget = row.spent > row.budgeted;
+                return (
+                  <div key={row.categoryId}>
+                    <div className="flex items-center justify-between text-sm mb-1">
+                      <span className="text-gray-700 dark:text-gray-300">
+                        {row.icon} {row.name}
+                      </span>
+                      <span className={overBudget ? "text-brand-danger font-medium" : "text-gray-600 dark:text-gray-400"}>
+                        {formatCurrency(row.spent)} / {formatCurrency(row.budgeted)}
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${overBudget ? "bg-brand-danger" : "bg-brand-primary"}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${overBudget ? "bg-brand-danger" : "bg-brand-primary"}`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </CollapsibleCard>
         </section>
       )}
 

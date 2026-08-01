@@ -160,6 +160,13 @@ export function RecurringExpenses({
   const today = now.getDate();
   const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
 
+  const activeItems = items.filter((item) => item.active);
+  const totalActive = activeItems.reduce((sum, item) => sum + item.amount, 0);
+  const totalPaid = activeItems
+    .filter((item) => item.lastGeneratedMonth === month && item.lastGeneratedYear === year)
+    .reduce((sum, item) => sum + item.amount, 0);
+  const totalPending = totalActive - totalPaid;
+
   return (
     <section className="card-surface">
       <button
@@ -170,11 +177,26 @@ export function RecurringExpenses({
         <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Gastos fijos (recurrentes){items.length > 0 ? ` · ${items.length}` : ""}
         </span>
-        <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "Ver"}</span>
+        <div className="flex items-center gap-3">
+          {activeItems.length > 0 && (
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalActive)}</span>
+          )}
+          <span className="text-sm text-brand-primary font-medium">{open ? "Cerrar" : "Ver"}</span>
+        </div>
       </button>
 
       {open && (
         <div className="border-t border-gray-100 p-4 space-y-4 dark:border-gray-800">
+          {activeItems.length > 0 && (
+            <div className="flex items-center justify-between text-xs rounded-xl bg-gray-50 px-3 py-2 dark:bg-gray-800/60">
+              <span className="text-gray-500 dark:text-gray-400">
+                Total mensual: <span className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(totalActive)}</span>
+              </span>
+              <span className="text-gray-500 dark:text-gray-400">
+                Pagado {formatCurrency(totalPaid)} · Pendiente {formatCurrency(totalPending)}
+              </span>
+            </div>
+          )}
           {items.length > 0 && (
             <div className="rounded-2xl border border-gray-100 divide-y divide-gray-100 dark:border-gray-800 dark:divide-gray-800">
               {items.map((item) => (
