@@ -7,6 +7,7 @@ const items = [
   { href: "/", label: "Inicio" },
   { href: "/gastos", label: "Gastos" },
   { href: "/ingresos", label: "Ingresos" },
+  { href: "/obra", label: "Obra" },
 ];
 
 export function BottomNav() {
@@ -14,7 +15,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-20 backdrop-blur-md bg-white/85 border-t border-black/[0.04] pb-[env(safe-area-inset-bottom)] dark:bg-gray-900/85 dark:border-white/[0.06]">
-      <ul className="grid grid-cols-3 px-2 py-2">
+      <ul className="grid grid-cols-4 px-2 py-2">
         {items.map((item) => {
           const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (

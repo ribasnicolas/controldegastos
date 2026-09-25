@@ -237,3 +237,40 @@ model Liability {
 
   @@index([userId])
 }
+
+enum TransactionKind {
+  INCOME
+  EXPENSE
+}
+
+model Work {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+
+  transactions WorkTransaction[]
+}
+
+model WorkTransaction {
+  id          String          @id @default(cuid())
+  workId      String
+  work        Work            @relation(fields: [workId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind        TransactionKind
+  amount      Decimal         @db.Decimal(12, 2)
+  currency    Currency
+  amountArs   Decimal?        @db.Decimal(12, 2)
+  description String?
+  materialType String?
+  paymentMethod PaymentMethod?
+  date        DateTime        @default(now())
+  createdAt   DateTime        @default(now())
+
+  @@index([workId, userId, date])
+}
