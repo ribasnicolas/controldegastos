@@ -14,6 +14,12 @@ const workSchema = z.object({
   endDate: z.string().optional(),
 });
 
+const updateWorkSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1, "Nombre requerido"),
+  description: z.string().max(500).optional(),
+});
+
 const transactionSchema = z.object({
   workId: z.string().min(1),
   kind: z.enum(["INCOME", "EXPENSE"]),
@@ -47,6 +53,28 @@ export async function createWork(_prev: ActionState, formData: FormData): Promis
   });
 
   revalidatePath("/obra");
+  return { success: true };
+}
+
+export async function updateWork(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = updateWorkSchema.safeParse({
+    id: formData.get("id"),
+    name: formData.get("name"),
+    description: formData.get("description") || undefined,
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+
+  const work = await prisma.work.findFirst({ where: { id: parsed.data.id, userId: user.id } });
+  if (!work) return { error: "Obra no encontrada" };
+
+  await prisma.work.update({
+    where: { id: work.id },
+    data: { name: parsed.data.name, description: parsed.data.description ?? null },
+  });
+
+  revalidatePath("/obra");
+  revalidatePath(`/obra/${work.id}`);
   return { success: true };
 }
 
@@ -103,13 +131,17 @@ export async function createWorkTransaction(_prev: ActionState, formData: FormDa
   });
 
   revalidatePath("/obra");
+  revalidatePath(`/obra/${parsed.data.workId}`);
   return { success: true };
 }
 
 export async function deleteWorkTransaction(id: string) {
   const user = await requireUser();
-  await prisma.workTransaction.deleteMany({ where: { id, userId: user.id } });
+  const transaction = await prisma.workTransaction.findFirst({ where: { id, userId: user.id } });
+  if (!transaction) return;
+  await prisma.workTransaction.delete({ where: { id: transaction.id } });
   revalidatePath("/obra");
+  revalidatePath(`/obra/${transaction.workId}`);
 }
 
 export async function listWorksForUser(userId: string) {

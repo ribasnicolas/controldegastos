@@ -1,11 +1,14 @@
 import { getWorkWithTransactions } from "@/lib/actions/works";
 import { requireUser } from "@/lib/session";
 import { TransactionForm } from "../TransactionForm";
+import { WorkHeader } from "../WorkHeader";
 import Link from "next/link";
 
-export default async function WorkPage({ params }: { params: { id: string } }) {
+export default async function WorkPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   const user = await requireUser();
-  const work = await getWorkWithTransactions(params.id);
+  const work = await getWorkWithTransactions(id);
   if (!work || work.userId !== user.id) return <div>Obra no encontrada</div>;
 
   // Calcular totales simples
@@ -28,10 +31,7 @@ export default async function WorkPage({ params }: { params: { id: string } }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">{work.name}</h1>
-          <div className="text-sm text-gray-500">{work.description ?? ""}</div>
-        </div>
+        <WorkHeader work={{ id: work.id, name: work.name, description: work.description }} />
         <Link href="/obra" className="text-sm text-brand-primary">Volver</Link>
       </div>
 

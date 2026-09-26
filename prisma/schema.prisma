@@ -47,17 +47,17 @@ model Household {
 // ─── Usuario ───────────────────────────────────────────────────────────────
 
 model User {
-  id          String   @id @default(cuid())
-  name        String
-  email       String   @unique
-  password    String
-  role        Role     @default(USER)
-  active      Boolean  @default(true)
-  householdId String?
-  household   Household? @relation(fields: [householdId], references: [id])
-  actualBalance Decimal? @db.Decimal(12, 2)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String     @id @default(cuid())
+  name          String
+  email         String     @unique
+  password      String
+  role          Role       @default(USER)
+  active        Boolean    @default(true)
+  householdId   String?
+  household     Household? @relation(fields: [householdId], references: [id])
+  actualBalance Decimal?   @db.Decimal(12, 2)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   expenses          Expense[]
   incomes           Income[]
@@ -67,6 +67,8 @@ model User {
   savingEntries     SavingEntry[]
   debts             Debt[]
   liabilities       Liability[]
+  works             Work[]
+  workTransactions  WorkTransaction[]
 }
 
 // ─── Categorías de gasto e ingreso (gestionadas desde el módulo admin) ────
@@ -92,19 +94,19 @@ model Category {
 // ─── Gastos ──────────────────────────────────────────────────────────────
 
 model Expense {
-  id                 String   @id @default(cuid())
-  userId             String
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId         String
-  category           Category @relation(fields: [categoryId], references: [id])
-  amount             Decimal       @db.Decimal(12, 2)
-  description        String?
-  icon               String?
-  paymentMethod      PaymentMethod @default(TRANSFER)
-  date               DateTime      @default(now())
-  createdAt          DateTime      @default(now())
-  sourceRecurringId  String?
-  sourceLiabilityId  String?
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId        String
+  category          Category      @relation(fields: [categoryId], references: [id])
+  amount            Decimal       @db.Decimal(12, 2)
+  description       String?
+  icon              String?
+  paymentMethod     PaymentMethod @default(TRANSFER)
+  date              DateTime      @default(now())
+  createdAt         DateTime      @default(now())
+  sourceRecurringId String?
+  sourceLiabilityId String?
 
   @@index([userId, date])
 }
@@ -112,18 +114,18 @@ model Expense {
 // ─── Ingresos ────────────────────────────────────────────────────────────
 
 model Income {
-  id                 String   @id @default(cuid())
-  userId             String
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId         String
-  category           Category @relation(fields: [categoryId], references: [id])
-  amount             Decimal  @db.Decimal(12, 2)
-  description        String?
-  icon               String?
-  date               DateTime @default(now())
-  createdAt          DateTime @default(now())
-  sourceRecurringId  String?
-  sourceDebtId       String?
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId        String
+  category          Category @relation(fields: [categoryId], references: [id])
+  amount            Decimal  @db.Decimal(12, 2)
+  description       String?
+  icon              String?
+  date              DateTime @default(now())
+  createdAt         DateTime @default(now())
+  sourceRecurringId String?
+  sourceDebtId      String?
 
   @@index([userId, date])
 }
@@ -148,35 +150,35 @@ model Budget {
 // ─── Gastos fijos recurrentes (requieren confirmación manual de pago) ────
 
 model RecurringExpense {
-  id                  String   @id @default(cuid())
-  userId              String
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId          String
-  category            Category @relation(fields: [categoryId], references: [id])
-  amount              Decimal  @db.Decimal(12, 2)
-  description         String?
-  dayOfMonth          Int
-  active              Boolean  @default(true)
-  lastGeneratedMonth  Int?
-  lastGeneratedYear   Int?
-  createdAt           DateTime @default(now())
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId         String
+  category           Category @relation(fields: [categoryId], references: [id])
+  amount             Decimal  @db.Decimal(12, 2)
+  description        String?
+  dayOfMonth         Int
+  active             Boolean  @default(true)
+  lastGeneratedMonth Int?
+  lastGeneratedYear  Int?
+  createdAt          DateTime @default(now())
 }
 
 // ─── Ingresos fijos recurrentes ──────────────────────────────────────────
 
 model RecurringIncome {
-  id                  String   @id @default(cuid())
-  userId              String
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId          String
-  category            Category @relation(fields: [categoryId], references: [id])
-  amount              Decimal  @db.Decimal(12, 2)
-  description         String?
-  dayOfMonth          Int
-  active              Boolean  @default(true)
-  lastGeneratedMonth  Int?
-  lastGeneratedYear   Int?
-  createdAt           DateTime @default(now())
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId         String
+  category           Category @relation(fields: [categoryId], references: [id])
+  amount             Decimal  @db.Decimal(12, 2)
+  description        String?
+  dayOfMonth         Int
+  active             Boolean  @default(true)
+  lastGeneratedMonth Int?
+  lastGeneratedYear  Int?
+  createdAt          DateTime @default(now())
 }
 
 // ─── Ahorros (en pesos o dólares) ─────────────────────────────────────────
@@ -226,8 +228,8 @@ model Liability {
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   personName       String
   totalAmount      Decimal  @db.Decimal(12, 2)
-  installments      Int      @default(1)
-  installmentsPaid  Int      @default(0)
+  installments     Int      @default(1)
+  installmentsPaid Int      @default(0)
   description      String?
   startMonth       Int
   startYear        Int
@@ -244,33 +246,33 @@ enum TransactionKind {
 }
 
 model Work {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name        String
   description String?
   startDate   DateTime?
   endDate     DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   transactions WorkTransaction[]
 }
 
 model WorkTransaction {
-  id          String          @id @default(cuid())
-  workId      String
-  work        Work            @relation(fields: [workId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind        TransactionKind
-  amount      Decimal         @db.Decimal(12, 2)
-  currency    Currency
-  amountArs   Decimal?        @db.Decimal(12, 2)
-  description String?
-  materialType String?
+  id            String          @id @default(cuid())
+  workId        String
+  work          Work            @relation(fields: [workId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind          TransactionKind
+  amount        Decimal         @db.Decimal(12, 2)
+  currency      Currency
+  amountArs     Decimal?        @db.Decimal(12, 2)
+  description   String?
+  materialType  String?
   paymentMethod PaymentMethod?
-  date        DateTime        @default(now())
-  createdAt   DateTime        @default(now())
+  date          DateTime        @default(now())
+  createdAt     DateTime        @default(now())
 
   @@index([workId, userId, date])
 }
