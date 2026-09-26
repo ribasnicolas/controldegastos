@@ -8,12 +8,15 @@ import { initialActionState } from "@/lib/actions/types";
 export function TransactionForm({ workId }: { workId: string }) {
   const [state, formAction] = useActionState(createWorkTransaction, initialActionState);
   const formRef = useRef<HTMLFormElement>(null);
+  const [kind, setKind] = useState("EXPENSE");
   const [currency, setCurrency] = useState("ARS");
 
   useEffect(() => {
     if (state.success) {
       toast.success("Movimiento guardado");
       formRef.current?.reset();
+      setKind("EXPENSE");
+      setCurrency("ARS");
     }
     if (state.error) toast.error(state.error);
   }, [state]);
@@ -28,15 +31,26 @@ export function TransactionForm({ workId }: { workId: string }) {
         <input type="hidden" name="workId" value={workId} />
         <div>
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
-          <select name="kind" defaultValue="EXPENSE" className="w-full h-12 rounded-xl border px-4">
+          <select name="kind" value={kind} onChange={(e) => setKind(e.target.value)} className="w-full h-12 rounded-xl border px-4">
             <option value="EXPENSE">Gasto</option>
             <option value="INCOME">Ingreso</option>
           </select>
         </div>
 
+        {kind === "EXPENSE" && (
+          <div>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
+            <select name="category" defaultValue="MATERIALS" className="w-full h-12 rounded-xl border px-4">
+              <option value="LABOR">Mano de obra</option>
+              <option value="MATERIALS">Materiales</option>
+              <option value="OTHER">Otro</option>
+            </select>
+          </div>
+        )}
+
         <div>
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Moneda</label>
-          <select name="currency" defaultValue="ARS" onChange={(e) => setCurrency(e.target.value)} className="w-full h-12 rounded-xl border px-4">
+          <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full h-12 rounded-xl border px-4">
             <option value="ARS">ARS</option>
             <option value="USD">USD</option>
           </select>
@@ -55,8 +69,8 @@ export function TransactionForm({ workId }: { workId: string }) {
         )}
 
         <div>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Material / Mano de obra (opcional)</label>
-          <input name="materialType" className="w-full h-12 rounded-xl border px-4" />
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Detalle (opcional)</label>
+          <input name="materialType" placeholder="Ej: cemento, albañil Juan" className="w-full h-12 rounded-xl border px-4" />
         </div>
 
         <div>

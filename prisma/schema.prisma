@@ -245,6 +245,12 @@ enum TransactionKind {
   EXPENSE
 }
 
+enum WorkExpenseCategory {
+  LABOR
+  MATERIALS
+  OTHER
+}
+
 model Work {
   id          String    @id @default(cuid())
   userId      String
@@ -268,6 +274,7 @@ model WorkTransaction {
   amount        Decimal         @db.Decimal(12, 2)
   currency      Currency
   amountArs     Decimal?        @db.Decimal(12, 2)
+  category      WorkExpenseCategory?
   description   String?
   materialType  String?
   paymentMethod PaymentMethod?
