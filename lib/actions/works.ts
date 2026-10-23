@@ -33,10 +33,15 @@ const transactionSchema = z
     description: z.string().max(200).optional(),
     materialType: z.string().max(100).optional(),
     date: z.string().optional(),
+    pending: z.boolean(),
   })
   .refine((data) => data.kind !== "EXPENSE" || !!data.category, {
     message: "Elegí una categoría para el gasto",
     path: ["category"],
+  })
+  .refine((data) => data.kind === "EXPENSE" || !data.pending, {
+    message: "Solo los gastos pueden quedar pendientes",
+    path: ["pending"],
   });
 
 const updateTransactionSchema = z
@@ -50,6 +55,7 @@ const updateTransactionSchema = z
     description: z.string().max(200).optional(),
     materialType: z.string().max(100).optional(),
     date: z.string().optional(),
+    approve: z.boolean(),
   })
   .refine((data) => data.kind !== "EXPENSE" || !!data.category, {
     message: "Elegí una categoría para el gasto",
@@ -130,6 +136,7 @@ export async function createWorkTransaction(_prev: ActionState, formData: FormDa
     description: formData.get("description") || undefined,
     materialType: formData.get("materialType") || undefined,
     date: formData.get("date") || undefined,
+    pending: formData.get("pending") === "on",
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
 
@@ -144,6 +151,7 @@ export async function createWorkTransaction(_prev: ActionState, formData: FormDa
       currency: parsed.data.currency,
       amountArs: amountArs ?? undefined,
       category: parsed.data.kind === "EXPENSE" ? parsed.data.category : undefined,
+      status: parsed.data.pending ? "PENDING" : "CONFIRMED",
       description: parsed.data.description ?? undefined,
       materialType: parsed.data.materialType ?? undefined,
       date: parsed.data.date ? parseDateInput(parsed.data.date) : new Date(),
@@ -167,6 +175,7 @@ export async function updateWorkTransaction(_prev: ActionState, formData: FormDa
     description: formData.get("description") || undefined,
     materialType: formData.get("materialType") || undefined,
     date: formData.get("date") || undefined,
+    approve: formData.get("approve") === "true",
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
 
@@ -175,6 +184,8 @@ export async function updateWorkTransaction(_prev: ActionState, formData: FormDa
 
   const computedAmountArs = await computeAmountArs(parsed.data.currency, parsed.data.amount, parsed.data.cotizacion);
   const amountArs = computedAmountArs ?? (transaction.amountArs ? Number(transaction.amountArs) : null);
+  // Un ingreso nunca queda pendiente; un gasto pendiente sigue así hasta que se aprueba
+  const status = parsed.data.approve || parsed.data.kind === "INCOME" ? "CONFIRMED" : transaction.status;
 
   await prisma.workTransaction.update({
     where: { id: transaction.id },
@@ -184,6 +195,7 @@ export async function updateWorkTransaction(_prev: ActionState, formData: FormDa
       currency: parsed.data.currency,
       amountArs: amountArs ?? undefined,
       category: parsed.data.kind === "EXPENSE" ? parsed.data.category : null,
+      status,
       description: parsed.data.description ?? null,
       materialType: parsed.data.materialType ?? null,
       date: parsed.data.date ? parseDateInput(parsed.data.date) : transaction.date,

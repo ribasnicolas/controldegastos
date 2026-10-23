@@ -38,6 +38,16 @@ export function TransactionForm({ workId }: { workId: string }) {
         </div>
 
         {kind === "EXPENSE" && (
+          <label className="flex items-start gap-3 rounded-xl border p-3">
+            <input name="pending" type="checkbox" className="mt-1 h-4 w-4" />
+            <span>
+              <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">Posible gasto / a pagar</span>
+              <span className="block text-xs text-gray-500">No suma a los gastos hasta que lo apruebes</span>
+            </span>
+          </label>
+        )}
+
+        {kind === "EXPENSE" && (
           <div>
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
             <select name="category" defaultValue="MATERIALS" className="w-full h-12 rounded-xl border px-4">

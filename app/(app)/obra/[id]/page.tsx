@@ -25,7 +25,19 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
   let totalExpenseArs = 0;
   const expenseByCategory: Record<string, number> = { LABOR: 0, MATERIALS: 0, OTHER: 0 };
 
-  for (const t of work.transactions) {
+  const confirmed = work.transactions.filter((t) => t.status === "CONFIRMED");
+  const pending = work.transactions.filter((t) => t.status === "PENDING");
+
+  // Los posibles gastos no afectan saldos ni totales hasta que se aprueban
+  let totalPendingArs = 0;
+  let totalPendingUsd = 0;
+  for (const t of pending) {
+    const amount = Number(t.amount);
+    if (t.currency === "USD") totalPendingUsd += amount;
+    totalPendingArs += t.amountArs != null ? Number(t.amountArs) : t.currency === "ARS" ? amount : 0;
+  }
+
+  for (const t of confirmed) {
     const amount = Number(t.amount);
     const arsEquivalent = t.amountArs != null ? Number(t.amountArs) : t.currency === "ARS" ? amount : 0;
 
@@ -100,13 +112,20 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
 
       <TransactionForm workId={work.id} />
 
-      <section className="card-surface p-4">
-        <h2 className="font-medium mb-2">Movimientos</h2>
-        {work.transactions.length === 0 ? (
-          <p className="text-sm text-gray-600">No hay movimientos</p>
-        ) : (
+      {pending.length > 0 && (
+        <section className="card-surface p-4">
+          <div className="flex items-start justify-between mb-2 gap-2">
+            <div>
+              <h2 className="font-medium">Posibles gastos / a pagar</h2>
+              <p className="text-xs text-gray-500">Aprobalos para sumarlos a los gastos</p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-semibold text-amber-600">ARS {totalPendingArs.toFixed(2)}</div>
+              {totalPendingUsd > 0 && <div className="text-xs text-gray-500">incluye USD {totalPendingUsd.toFixed(2)}</div>}
+            </div>
+          </div>
           <ul className="space-y-2">
-            {work.transactions.map((t) => (
+            {pending.map((t) => (
               <WorkTransactionRow
                 key={t.id}
                 transaction={{
@@ -119,6 +138,34 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
                   materialType: t.materialType,
                   description: t.description,
                   date: t.date,
+                  status: t.status,
+                }}
+              />
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="card-surface p-4">
+        <h2 className="font-medium mb-2">Movimientos</h2>
+        {confirmed.length === 0 ? (
+          <p className="text-sm text-gray-600">No hay movimientos</p>
+        ) : (
+          <ul className="space-y-2">
+            {confirmed.map((t) => (
+              <WorkTransactionRow
+                key={t.id}
+                transaction={{
+                  id: t.id,
+                  kind: t.kind,
+                  currency: t.currency,
+                  amount: Number(t.amount),
+                  amountArs: t.amountArs != null ? Number(t.amountArs) : null,
+                  category: t.category,
+                  materialType: t.materialType,
+                  description: t.description,
+                  date: t.date,
+                  status: t.status,
                 }}
               />
             ))}

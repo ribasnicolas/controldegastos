@@ -15,10 +15,13 @@ type Transaction = {
   materialType: string | null;
   description: string | null;
   date: Date;
+  status: string;
 };
 
 export function WorkTransactionRow({ transaction }: { transaction: Transaction }) {
   const [editing, setEditing] = useState(false);
+  const [approving, setApproving] = useState(false);
+  const pending = transaction.status === "PENDING";
 
   return (
     <li className="p-2 border rounded-lg flex justify-between items-center gap-2">
@@ -34,6 +37,15 @@ export function WorkTransactionRow({ transaction }: { transaction: Transaction }
           <div className="text-sm text-gray-500">(~ARS {transaction.amountArs.toFixed(2)})</div>
         )}
       </div>
+      {pending && (
+        <button
+          type="button"
+          onClick={() => setApproving(true)}
+          className="shrink-0 h-8 px-3 rounded-full bg-brand-primary text-white text-sm tap"
+        >
+          Aprobar
+        </button>
+      )}
       <ConfirmDeleteForm
         action={deleteWorkTransaction.bind(null, transaction.id)}
         confirmMessage="¿Eliminar este movimiento?"
@@ -41,6 +53,7 @@ export function WorkTransactionRow({ transaction }: { transaction: Transaction }
         ✕
       </ConfirmDeleteForm>
       {editing && <EditTransactionSheet transaction={transaction} onClose={() => setEditing(false)} />}
+      {approving && <EditTransactionSheet transaction={transaction} approving onClose={() => setApproving(false)} />}
     </li>
   );
 }

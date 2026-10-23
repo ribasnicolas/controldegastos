@@ -251,6 +251,11 @@ enum WorkExpenseCategory {
   OTHER
 }
 
+enum WorkTransactionStatus {
+  PENDING
+  CONFIRMED
+}
+
 model Work {
   id          String    @id @default(cuid())
   userId      String
@@ -265,21 +270,22 @@ model Work {
 }
 
 model WorkTransaction {
-  id            String          @id @default(cuid())
+  id            String                @id @default(cuid())
   workId        String
-  work          Work            @relation(fields: [workId], references: [id], onDelete: Cascade)
+  work          Work                  @relation(fields: [workId], references: [id], onDelete: Cascade)
   userId        String
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   kind          TransactionKind
-  amount        Decimal         @db.Decimal(12, 2)
+  amount        Decimal               @db.Decimal(12, 2)
   currency      Currency
-  amountArs     Decimal?        @db.Decimal(12, 2)
+  amountArs     Decimal?              @db.Decimal(12, 2)
   category      WorkExpenseCategory?
+  status        WorkTransactionStatus @default(CONFIRMED)
   description   String?
   materialType  String?
   paymentMethod PaymentMethod?
-  date          DateTime        @default(now())
-  createdAt     DateTime        @default(now())
+  date          DateTime              @default(now())
+  createdAt     DateTime              @default(now())
 
   @@index([workId, userId, date])
 }
